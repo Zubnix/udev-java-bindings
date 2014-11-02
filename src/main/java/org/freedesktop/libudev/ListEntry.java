@@ -4,7 +4,9 @@ package org.freedesktop.libudev;
 /**
  * udev_list
  * <p/>
- * access to libudev generated lists
+ * access to libudev generated lists.
+ * Opaque object representing one entry in a list.
+ * An entry contains a name, and optionally a value.
  */
 public class ListEntry implements HasPointer {
 
@@ -19,20 +21,48 @@ public class ListEntry implements HasPointer {
         return this.pointer;
     }
 
+    /**
+     * @return the next entry from the list, NULL is no more entries are found.
+     */
     public ListEntry getNext() {
-
+        final long listEntryPointer = LibUdevJNI.listEntryGetNext(getPointer());
+        if (listEntryPointer == 0) {
+            return null;
+        }
+        else {
+            return new ListEntry(listEntryPointer);
+        }
     }
 
+    /**
+     *
+     * @param name name string to match
+     * @return the entry where name matched, NULL if no matching entry is found.
+     */
     public ListEntry getByName(String name) {
-
+        final long listEntryPointer = LibUdevJNI.listEntryGetByName(getPointer(),name);
+        if (listEntryPointer == 0) {
+            return null;
+        }
+        else {
+            return new ListEntry(listEntryPointer);
+        }
     }
 
+    /**
+     *
+     * @return the name string of this entry.
+     */
     public String getName() {
-
+        return LibUdevJNI.listEntryGetName(getPointer());
     }
 
+    /**
+     *
+     * @return the value string of this entry.
+     */
     public String getValue() {
-
+        return LibUdevJNI.listEntryGetValue(getPointer());
     }
 
     @Override
