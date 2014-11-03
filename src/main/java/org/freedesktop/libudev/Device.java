@@ -2,7 +2,7 @@ package org.freedesktop.libudev;
 
 /**
  * udev_device
- * <p/>
+ * <p>
  * access to sysfs/kernel devices.
  * Representation of kernel sys devices.
  * Devices are uniquely identified by their syspath,
@@ -19,16 +19,15 @@ public class Device implements HasPointer {
      * @param syspath sys device path including sys directory
      * @return a new udev device, or NULL, if it does not exist
      */
-    public static Device newFromSyspath(LibUdev udev,
-                                        String syspath) {
+    public static Device newFromSyspath(final LibUdev udev,
+                                        final String syspath) {
         final long devicePointer = LibUdevJNI.deviceNewFromSyspath(udev.getPointer(),
-                                                                   syspath);
+                syspath);
         if (devicePointer == 0) {
             return null;
-        }
-        else {
+        } else {
             return new Device(devicePointer,
-                              true);
+                    true);
         }
     }
 
@@ -42,18 +41,17 @@ public class Device implements HasPointer {
      * @param devnum device major/minor number
      * @return a new udev device, or NULL, if it does not exist
      */
-    public static Device newFromDevnum(LibUdev udev,
-                                       int type,
-                                       long devnum) {
+    public static Device newFromDevnum(final LibUdev udev,
+                                       final int type,
+                                       final long devnum) {
         final long devicePointer = LibUdevJNI.deviceNewFromDevnum(udev.getPointer(),
-                                                                  type,
-                                                                  devnum);
+                type,
+                devnum);
         if (devicePointer == 0) {
             return null;
-        }
-        else {
+        } else {
             return new Device(devicePointer,
-                              true);
+                    true);
         }
     }
 
@@ -67,18 +65,17 @@ public class Device implements HasPointer {
      * @param sysname   the name of the device
      * @return a new udev device, or NULL, if it does not exist
      */
-    public static Device newFromSubsystemSysname(LibUdev udev,
-                                                 String subsystem,
-                                                 String sysname) {
+    public static Device newFromSubsystemSysname(final LibUdev udev,
+                                                 final String subsystem,
+                                                 final String sysname) {
         final long devicePointer = LibUdevJNI.deviceNewFromSubsystemSysname(udev.getPointer(),
-                                                                            subsystem,
-                                                                            sysname);
+                subsystem,
+                sysname);
         if (devicePointer == 0) {
             return null;
-        }
-        else {
+        } else {
             return new Device(devicePointer,
-                              true);
+                    true);
         }
     }
 
@@ -91,16 +88,15 @@ public class Device implements HasPointer {
      * @param id   text string identifying a kernel device
      * @return a new udev device, or NULL, if it does not exist
      */
-    public static Device newFromDeviceId(LibUdev udev,
-                                         String id) {
+    public static Device newFromDeviceId(final LibUdev udev,
+                                         final String id) {
         final long devicePointer = LibUdevJNI.deviceNewFromDeviceId(udev.getPointer(),
-                                                                    id);
+                id);
         if (devicePointer == 0) {
             return null;
-        }
-        else {
+        } else {
             return new Device(devicePointer,
-                              true);
+                    true);
         }
     }
 
@@ -112,18 +108,17 @@ public class Device implements HasPointer {
      * @param udev udev library context
      * @return a new udev device, or NULL, if it does not exist
      */
-    public static Device newFromEnvironment(LibUdev udev) {
+    public static Device newFromEnvironment(final LibUdev udev) {
         final long devicePointer = LibUdevJNI.deviceNewFromEnvironment(udev.getPointer());
         if (devicePointer == 0) {
             return null;
-        }
-        else {
+        } else {
             return new Device(devicePointer,
-                              true);
+                    true);
         }
     }
 
-    private final long    pointer;
+    private final long pointer;
     private final boolean refCount;
 
     public Device(final long pointer,
@@ -131,8 +126,7 @@ public class Device implements HasPointer {
         this.refCount = refCount;
         if (refCount) {
             this.pointer = LibUdevJNI.deviceRef(pointer);
-        }
-        else {
+        } else {
             this.pointer = pointer;
         }
     }
@@ -153,7 +147,7 @@ public class Device implements HasPointer {
 
     /**
      * Find the next parent device, and fill in information from the sys device and the udev database entry.
-     * <p/>
+     * <p>
      * It is not necessarily just the upper level directory, empty or not recognized sys directories are ignored.
      *
      * @return a new udev device, or NULL, if it no parent exist.
@@ -162,33 +156,31 @@ public class Device implements HasPointer {
         final long devicePointer = LibUdevJNI.deviceGetParent(getPointer());
         if (devicePointer == 0) {
             return null;
-        }
-        else {
+        } else {
             return new Device(devicePointer,
-                              false);
+                    false);
         }
     }
 
     /**
      * Find the next parent device, with a matching subsystem and devtype value, and fill in information from the sys device and the udev database entry.
-     * <p/>
+     * <p>
      * If devtype is NULL, only subsystem is checked, and any devtype will match.
      *
      * @param subsystem the subsystem of the device
      * @param devtype   the type (DEVTYPE) of the device
      * @return a new udev device, or NULL if no matching parent exists.
      */
-    public Device getParentWithSubsystemDevtype(String subsystem,
-                                                String devtype) {
+    public Device getParentWithSubsystemDevtype(final String subsystem,
+                                                final String devtype) {
         final long devicePointer = LibUdevJNI.deviceGetParentWithSubsystemDevtype(getPointer(),
-                                                                                  subsystem,
-                                                                                  devtype);
+                subsystem,
+                devtype);
         if (devicePointer == 0) {
             return null;
-        }
-        else {
+        } else {
             return new Device(devicePointer,
-                              false);
+                    false);
         }
     }
 
@@ -260,7 +252,7 @@ public class Device implements HasPointer {
     /**
      * Check if udev has already handled the device and has set up device node permissions and context,
      * or has renamed a network device.
-     * <p/>
+     * <p>
      * This is only implemented for devices with a device node or network interfaces.
      * All other devices return true here.
      *
@@ -293,52 +285,116 @@ public class Device implements HasPointer {
      * @return the first entry of the property list
      */
     public ListEntry getProperties() {
-
+        return new ListEntry(LibUdevJNI.deviceGetProperties(getPointer()));
     }
 
+    /**
+     * Retrieve the list of tags attached to the udev device.
+     * The next list entry can be retrieved with {@link ListEntry#getNext()}, which returns NULL if no more entries exist.
+     * The tag string can be retrieved from the list entry by {@link ListEntry#getName()}.
+     *
+     * @return the first entry of the tag list
+     */
     public ListEntry getTags() {
-
+        return new ListEntry(LibUdevJNI.deviceGetTags(getPointer()));
     }
 
+    /**
+     * Retrieve the list of available sysattrs, with value being empty;
+     * This just return all available sysfs attributes for a particular device without reading their values.
+     *
+     * @return the first entry of the property list
+     */
     public ListEntry getSysattr() {
-
+        return new ListEntry(LibUdevJNI.deviceGetSysattr(getPointer()));
     }
 
-    public String getPropertyValue(String key) {
-
+    /**
+     * @param key property name
+     * @return the value of a device property, or NULL if there is no such property.
+     */
+    public String getPropertyValue(final String key) {
+        return LibUdevJNI.deviceGetPropertyValue(getPointer(),
+                key);
     }
 
+    /**
+     * @return the driver string, or NULL if there is no driver attached.
+     */
     public String getDriver() {
-
+        return LibUdevJNI.deviceGetDriver(getPointer());
     }
 
+    /**
+     * @return the device major/minor number.
+     */
     public long getDevnum() {
-
+        return LibUdevJNI.deviceGetDevnum(getPointer());
     }
 
+    /**
+     * This is only valid if the device was received through a monitor. Devices read from sys do not have an
+     * action string. Usual actions are: add, remove, change, online, offline.
+     *
+     * @return the kernel action value, or NULL if there is no action value available.
+     */
     public String getAction() {
-
+        return LibUdevJNI.deviceGetAction(getPointer());
     }
 
+    /**
+     * This is only valid if the device was received through a monitor.
+     * Devices read from sys do not have a sequence number.
+     *
+     * @return the kernel event sequence number, or 0 if there is no sequence number available.
+     */
     public long getSegnum() {
-
+        return LibUdevJNI.deviceGetSeqnum(getPointer());
     }
 
+    /**
+     * Return the number of microseconds passed since udev set up the device for the first time.
+     * <p>
+     * This is only implemented for devices with need to store properties in the udev database. All other devices return 0 here.
+     *
+     * @return he number of microseconds since the device was first seen.
+     */
     public long getUsecSinceInitialized() {
-
+        return LibUdevJNI.deviceGetUsecSinceUnitialized(getPointer());
     }
 
-    public String getSysattrValue(String sysattr) {
-
+    /**
+     * The retrieved value is cached in the device.
+     * Repeated calls will return the same value and not open the attribute again.
+     *
+     * @param sysattr attribute name
+     * @return The content of a sys attribute file, or NULL if there is no sys attribute value.
+     */
+    public String getSysattrValue(final String sysattr) {
+        return LibUdevJNI.deviceGetSysattrValue(getPointer(),
+                sysattr);
     }
 
-    public int setSysattrValue(String sysattr,
-                               String value) {
-
+    /**
+     * Update the contents of the sys attribute and the cached value of the device.
+     *
+     * @param sysattr attribute name
+     * @param value   new value to be set
+     * @return Negative error code on failure or 0 on success.
+     */
+    public int setSysattrValue(final String sysattr,
+                               final String value) {
+        return LibUdevJNI.deviceSetSysattrValue(getPointer(), sysattr, value);
     }
 
-    public boolean hasTag(String tag) {
-
+    /**
+     * Check if a given device has a certain tag associated.
+     *
+     * @param tag tag name
+     * @return true if the tag is found. false otherwise.
+     */
+    public boolean hasTag(final String tag) {
+        return LibUdevJNI.deviceHasTag(getPointer(), tag);
     }
 
     @Override

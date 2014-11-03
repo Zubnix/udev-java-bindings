@@ -1,20 +1,29 @@
 package org.freedesktop.libudev;
 
 /**
- * udev_queue
- * <p/>
- * access to the currently running udev events
+ * udev_queue — access to currently active events
+ * <p>
+ * This exports the current state of the udev processing queue.
  */
-public class Queue implements HasPointer{
+public class Queue implements HasPointer {
 
-    public static Queue create(LibUdev udev){
-
+    /**
+     * @param udev udev library context
+     * @return the udev queue context, or NULL on error.
+     */
+    public static Queue create(final LibUdev udev) {
+        final long queuePointer = LibUdevJNI.queueNew(udev.getPointer());
+        if (queuePointer == 0) {
+            return null;
+        } else {
+            return new Queue(queuePointer);
+        }
     }
 
     private final long pointer;
 
     public Queue(final long pointer) {
-        this.pointer = pointer;
+        this.pointer = LibUdevJNI.queueRef(pointer);
     }
 
     @Override
@@ -22,49 +31,39 @@ public class Queue implements HasPointer{
         return pointer;
     }
 
-    public LibUdev getUdev(){
-
+    /**
+     * Retrieve the udev library context the queue context was created with.
+     *
+     * @return the udev library context.
+     */
+    public LibUdev getUdev() {
+        return new LibUdev(LibUdevJNI.queueGetUdev(getPointer()));
     }
 
-    @Deprecated
-    public long getKernelSeqnum(){
-
+    /**
+     * Check if udev is active on the system.
+     *
+     * @return a flag indicating if udev is active.
+     */
+    public boolean getUdevIsActive() {
+        return LibUdevJNI.queueGetUdevIsActive(getPointer());
     }
 
-    @Deprecated
-    public long getUdevSeqnum(){
-
+    /**
+     * Check if udev is currently processing any events.
+     *
+     * @return a flag indicating if udev is currently handling events.
+     */
+    public boolean getQueueIsEmpty() {
+        return LibUdevJNI.queueGetQueueIsEmpty(getPointer());
     }
 
-    public boolean getUdevIsActive(){
-
+    public int getFd() {
+        return LibUdevJNI.queueGetFd(getPointer());
     }
 
-    public boolean getQueueIsEmpty(){
-
-    }
-
-    @Deprecated
-    public boolean getSeqnumIsFinished(long seqnum){
-
-    }
-
-    @Deprecated
-    public boolean getSeqnumSequenceIsFinished(long start, long end){
-
-    }
-
-    public int getFd(){
-
-    }
-
-    public int flush(){
-
-    }
-
-    @Deprecated
-    public ListEntry getQueuedListEntry(){
-
+    public int flush() {
+        return LibUdevJNI.queueFlush(getPointer());
     }
 
     @Override
@@ -85,5 +84,11 @@ public class Queue implements HasPointer{
     @Override
     public int hashCode() {
         return (int) (pointer);
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        LibUdevJNI.queueUnref(getPointer());
+        super.finalize();
     }
 }

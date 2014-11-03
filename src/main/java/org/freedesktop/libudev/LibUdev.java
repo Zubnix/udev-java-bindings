@@ -2,7 +2,7 @@ package org.freedesktop.libudev;
 
 /**
  * udev - library context
- * <p/>
+ * <p>
  * reads the udev config and system environment
  * allows custom logging
  */
@@ -34,9 +34,9 @@ public class LibUdev implements HasPointer {
      *
      * @param logger function to be called for logging messages
      */
-    public void setLogger(Logger logger) {
+    public void setLogger(final Logger logger) {
         LibUdevJNI.udevSetLogFn(getPointer(),
-                                logger);
+                logger);
     }
 
     /**
@@ -54,9 +54,9 @@ public class LibUdev implements HasPointer {
      *
      * @param priority the new logging priority
      */
-    public void setLogPriority(int priority) {
+    public void setLogPriority(final int priority) {
         LibUdevJNI.udevSetLogPriority(getPointer(),
-                                      priority);
+                priority);
     }
 
     /**
@@ -68,9 +68,9 @@ public class LibUdev implements HasPointer {
         return LibUdevJNI.udevGetUserData(getPointer());
     }
 
-    public void setUserdata(Object userdata) {
+    public void setUserdata(final Object userdata) {
         LibUdevJNI.udevSetUserdata(getPointer(),
-                                   userdata);
+                userdata);
     }
 
     @Override
@@ -97,4 +97,6 @@ public class LibUdev implements HasPointer {
         LibUdevJNI.udevUnref(getPointer());
         super.finalize();
     }
+
+
 }
