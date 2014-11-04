@@ -39,7 +39,7 @@ public class ListEntry implements HasPointer {
      * @param name name string to match
      * @return the entry where name matched, NULL if no matching entry is found.
      */
-    public ListEntry getByName(String name) {
+    public ListEntry getByName(final String name) {
         final long listEntryPointer = LibUdevJNI.listEntryGetByName(getPointer(),name);
         if (listEntryPointer == 0) {
             return null;
