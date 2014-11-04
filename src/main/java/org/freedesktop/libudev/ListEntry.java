@@ -3,7 +3,7 @@ package org.freedesktop.libudev;
 
 /**
  * udev_list
- * <p/>
+ * <p>
  * access to libudev generated lists.
  * Opaque object representing one entry in a list.
  * An entry contains a name, and optionally a value.
