@@ -1,33 +1,38 @@
 package org.freedesktop.libudev;
 
+import com.sun.jna.Pointer;
+import org.freedesktop.libudev.jna.StructUdevQueue;
+import org.freedesktop.libudev.jna.UdevLibrary;
+
 /**
  * udev_queue — access to currently active events
- * <p>
+ * <p/>
  * This exports the current state of the udev processing queue.
  */
-public class Queue implements HasPointer {
+public class Queue implements HasPointer<StructUdevQueue> {
 
     /**
      * @param udev udev library context
      * @return the udev queue context, or NULL on error.
      */
     public static Queue create(final LibUdev udev) {
-        final long queuePointer = LibUdevJNI.queueNew(udev.getPointer());
-        if (queuePointer == 0) {
+        final StructUdevQueue queuePointer = UdevLibrary.INSTANCE.udev_queue_new(udev.getPointer());
+        if (queuePointer == null) {
             return null;
-        } else {
+        }
+        else {
             return new Queue(queuePointer);
         }
     }
 
-    private final long pointer;
+    private final StructUdevQueue pointer;
 
-    public Queue(final long pointer) {
-        this.pointer = LibUdevJNI.queueRef(pointer);
+    public Queue(final StructUdevQueue pointer) {
+        this.pointer = pointer;
     }
 
     @Override
-    public long getPointer() {
+    public StructUdevQueue getPointer() {
         return pointer;
     }
 
@@ -37,7 +42,7 @@ public class Queue implements HasPointer {
      * @return the udev library context.
      */
     public LibUdev getUdev() {
-        return new LibUdev(LibUdevJNI.queueGetUdev(getPointer()));
+        return new LibUdev(UdevLibrary.INSTANCE.udev_ref(UdevLibrary.INSTANCE.udev_queue_get_udev(getPointer())));
     }
 
     /**
@@ -46,7 +51,7 @@ public class Queue implements HasPointer {
      * @return a flag indicating if udev is active.
      */
     public boolean getUdevIsActive() {
-        return LibUdevJNI.queueGetUdevIsActive(getPointer());
+        return UdevLibrary.INSTANCE.udev_queue_get_udev_is_active(getPointer());
     }
 
     /**
@@ -55,15 +60,15 @@ public class Queue implements HasPointer {
      * @return a flag indicating if udev is currently handling events.
      */
     public boolean getQueueIsEmpty() {
-        return LibUdevJNI.queueGetQueueIsEmpty(getPointer());
+        return UdevLibrary.INSTANCE.udev_queue_get_queue_is_empty(getPointer());
     }
 
     public int getFd() {
-        return LibUdevJNI.queueGetFd(getPointer());
+        return UdevLibrary.INSTANCE.udev_queue_get_fd(getPointer());
     }
 
     public int flush() {
-        return LibUdevJNI.queueFlush(getPointer());
+        return UdevLibrary.INSTANCE.udev_queue_flush(getPointer());
     }
 
     @Override
@@ -75,20 +80,20 @@ public class Queue implements HasPointer {
             return false;
         }
 
-        final Queue queue = (Queue) o;
+        final Queue that = (Queue) o;
 
-        return pointer == queue.pointer;
+        return Pointer.nativeValue(pointer.getPointer()) == Pointer.nativeValue(that.pointer.getPointer());
 
     }
 
     @Override
     public int hashCode() {
-        return (int) (pointer);
+        return pointer.hashCode();
     }
 
     @Override
     protected void finalize() throws Throwable {
-        LibUdevJNI.queueUnref(getPointer());
+        UdevLibrary.INSTANCE.udev_queue_unref(getPointer());
         super.finalize();
     }
 }

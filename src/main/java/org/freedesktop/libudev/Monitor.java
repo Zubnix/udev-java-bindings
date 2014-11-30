@@ -1,26 +1,31 @@
 package org.freedesktop.libudev;
 
+import com.sun.jna.Pointer;
+import org.freedesktop.libudev.jna.StructUdevDevice;
+import org.freedesktop.libudev.jna.StructUdevMonitor;
+import org.freedesktop.libudev.jna.UdevLibrary;
+
 /**
  * udev_monitor — device event source
- * <p>
+ * <p/>
  * Connects to a device event source.
  */
-public class Monitor implements HasPointer {
+public class Monitor implements HasPointer<StructUdevMonitor> {
 
-    private final long pointer;
+    private final StructUdevMonitor pointer;
 
-    public Monitor(final long pointer) {
-        this.pointer = LibUdevJNI.monitRef(pointer);
+    public Monitor(final StructUdevMonitor pointer) {
+        this.pointer = pointer;
     }
 
     @Override
-    public long getPointer() {
+    public StructUdevMonitor getPointer() {
         return pointer;
     }
 
     /**
      * * Create new udev monitor and connect to a specified event source. Valid sources identifiers are "udev" and "kernel".
-     * <p>
+     * <p/>
      * Applications should usually not connect directly to the "kernel" events,
      * because the devices might not be useable at that time, before udev has configured them,
      * and created device nodes. Accessing devices at the same time as udev, might result in unpredictable behavior.
@@ -33,10 +38,12 @@ public class Monitor implements HasPointer {
      */
     public static Monitor newFromNetlink(final LibUdev udev,
                                          final String name) {
-        final long monitorPointer = LibUdevJNI.monitorNewFromNetlink(udev.getPointer(), name);
-        if (monitorPointer == 0) {
+        final StructUdevMonitor monitorPointer = UdevLibrary.INSTANCE.udev_monitor_new_from_netlink(udev.getPointer(),
+                                                                                                    name);
+        if (monitorPointer == null) {
             return null;
-        } else {
+        }
+        else {
             return new Monitor(monitorPointer);
         }
     }
@@ -47,7 +54,7 @@ public class Monitor implements HasPointer {
      * @return the udev library context
      */
     public LibUdev getUdev() {
-        return new LibUdev(LibUdevJNI.monitorGetUdev(getPointer()));
+        return new LibUdev(UdevLibrary.INSTANCE.udev_ref(UdevLibrary.INSTANCE.udev_monitor_get_udev(getPointer())));
     }
 
     /**
@@ -56,7 +63,7 @@ public class Monitor implements HasPointer {
      * @return 0 on success, otherwise a negative error value.
      */
     public int enableReceiving() {
-        return LibUdevJNI.monitorEnableReceiving(getPointer());
+        return UdevLibrary.INSTANCE.udev_monitor_enable_receiving(getPointer());
     }
 
     /**
@@ -66,7 +73,8 @@ public class Monitor implements HasPointer {
      * @return 0 on success, otherwise -1 on error.
      */
     public int setReceiveBufferSize(final int size) {
-        return LibUdevJNI.monitorSetReceiveBufferSize(getPointer(), size);
+        return UdevLibrary.INSTANCE.udev_monitor_set_receive_buffer_size(getPointer(),
+                                                                         size);
     }
 
     /**
@@ -75,14 +83,14 @@ public class Monitor implements HasPointer {
      * @return the socket file descriptor
      */
     public int getFd() {
-        return LibUdevJNI.monitorGetFd(getPointer());
+        return UdevLibrary.INSTANCE.udev_monitor_get_fd(getPointer());
     }
 
     /**
      * Receive data from the udev monitor socket, allocate a new udev device, fill in the received data, and return the device.
-     * <p>
+     * <p/>
      * Only socket connections with uid=0 are accepted.
-     * <p>
+     * <p/>
      * The monitor socket is by default set to NONBLOCK.
      * A variant of poll() on the file descriptor returned by {@link #getFd()} should to be used to wake up when
      * new devices arrive, or alternatively the file descriptor switched into blocking mode.
@@ -90,17 +98,18 @@ public class Monitor implements HasPointer {
      * @return a new udev device, or NULL, in case of an error
      */
     public Device receiveDevice() {
-        final long devicePointer = LibUdevJNI.monitorReceiveDevice(getPointer());
-        if (devicePointer == 0) {
+        final StructUdevDevice devicePointer = UdevLibrary.INSTANCE.udev_monitor_receive_device(getPointer());
+        if (devicePointer == null) {
             return null;
-        } else {
-            return new Device(devicePointer, true);
+        }
+        else {
+            return new Device(devicePointer);
         }
     }
 
     /**
      * This filter is efficiently executed inside the kernel, and libudev subscribers will usually not be woken up for devices which do not match.
-     * <p>
+     * <p/>
      * The filter must be installed before the monitor is switched to listening mode.
      *
      * @param subsystem the subsystem value to match the incoming devices against
@@ -109,19 +118,22 @@ public class Monitor implements HasPointer {
      */
     public int addMatchSubsystemDevtype(final String subsystem,
                                         final String devtype) {
-        return LibUdevJNI.monitorAddMatchSubsystemDevtype(getPointer(), subsystem, devtype);
+        return UdevLibrary.INSTANCE.udev_monitor_filter_add_match_subsystem_devtype(getPointer(),
+                                                                                    subsystem,
+                                                                                    devtype);
     }
 
     /**
      * This filter is efficiently executed inside the kernel, and libudev subscribers will usually not be woken up for devices which do not match.
-     * <p>
+     * <p/>
      * The filter must be installed before the monitor is switched to listening mode.
      *
      * @param tag the name of a tag
      * @return 0 on success, otherwise a negative error value.
      */
     public int addMatchTag(final String tag) {
-        return LibUdevJNI.monitorAddMatchTag(getPointer(), tag);
+        return UdevLibrary.INSTANCE.udev_monitor_filter_add_match_tag(getPointer(),
+                                                                      tag);
     }
 
     /**
@@ -130,7 +142,7 @@ public class Monitor implements HasPointer {
      * @return 0 on success, otherwise a negative error value.
      */
     public int filterUpdate() {
-        return LibUdevJNI.monitorFilterUpdate(getPointer());
+        return UdevLibrary.INSTANCE.udev_monitor_filter_update(getPointer());
     }
 
     /**
@@ -138,8 +150,8 @@ public class Monitor implements HasPointer {
      *
      * @return 0 on success, otherwise a negative error value.
      */
-    public int filterRemote() {
-        return LibUdevJNI.monitorFilterRemote(getPointer());
+    public int filterRemove() {
+        return UdevLibrary.INSTANCE.udev_monitor_filter_remove(getPointer());
     }
 
     @Override
@@ -151,19 +163,19 @@ public class Monitor implements HasPointer {
             return false;
         }
 
-        final Monitor monitor = (Monitor) o;
+        final Monitor that = (Monitor) o;
 
-        return pointer == monitor.pointer;
+        return Pointer.nativeValue(pointer.getPointer()) == Pointer.nativeValue(that.pointer.getPointer());
     }
 
     @Override
     public int hashCode() {
-        return (int) (pointer);
+        return pointer.hashCode();
     }
 
     @Override
     protected void finalize() throws Throwable {
-        LibUdevJNI.monitorUnref(getPointer());
+        UdevLibrary.INSTANCE.udev_monitor_unref(getPointer());
         super.finalize();
     }
 }

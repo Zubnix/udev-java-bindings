@@ -1,29 +1,33 @@
 package org.freedesktop.libudev;
 
+import com.sun.jna.Pointer;
+import org.freedesktop.libudev.jna.StructUdevEnumerate;
+import org.freedesktop.libudev.jna.UdevLibrary;
+
 /**
  * udev_enumerate — lookup and sort sys devices
- * <p>
+ * <p/>
  * Lookup devices in the sys filesystem, filter devices by properties, and return a sorted list of devices.
  */
-public class Enumerate implements HasPointer {
+public class Enumerate implements HasPointer<StructUdevEnumerate> {
 
     /**
      * Create an enumeration context to scan /sys.
      *
      * @return an enumeration context.
      */
-    public static Enumerate create() {
-        return new Enumerate(LibUdevJNI.enumerateNew());
+    public static Enumerate create(LibUdev libUdev) {
+        return new Enumerate(UdevLibrary.INSTANCE.udev_enumerate_new(libUdev.getPointer()));
     }
 
-    private final long pointer;
+    private final StructUdevEnumerate pointer;
 
-    public Enumerate(final long pointer) {
-        this.pointer = LibUdevJNI.enumerateRef(pointer);
+    public Enumerate(final StructUdevEnumerate pointer) {
+        this.pointer = pointer;
     }
 
     @Override
-    public long getPointer() {
+    public StructUdevEnumerate getPointer() {
         return this.pointer;
     }
 
@@ -33,7 +37,7 @@ public class Enumerate implements HasPointer {
      * @return the context.
      */
     public LibUdev getUdev() {
-        return new LibUdev(LibUdevJNI.enumerateGetUdev(getPointer()));
+        return new LibUdev(UdevLibrary.INSTANCE.udev_ref(UdevLibrary.INSTANCE.udev_enumerate_get_udev(getPointer())));
     }
 
     /**
@@ -43,7 +47,8 @@ public class Enumerate implements HasPointer {
      * @return 0 on success, otherwise a negative error value.
      */
     public int addMatchSubsystem(final String subsystem) {
-        return LibUdevJNI.enumerateAddMatchSubsystem(getPointer(), subsystem);
+        return UdevLibrary.INSTANCE.udev_enumerate_add_match_subsystem(getPointer(),
+                                                                       subsystem);
     }
 
     /**
@@ -53,7 +58,8 @@ public class Enumerate implements HasPointer {
      * @return 0 on success, otherwise a negative error value.
      */
     public int addNomatchSubsystem(final String subsystem) {
-        return LibUdevJNI.enumerateAddNomatchSubsystem(getPointer(), subsystem);
+        return UdevLibrary.INSTANCE.udev_enumerate_add_nomatch_subsystem(getPointer(),
+                                                                         subsystem);
     }
 
     /**
@@ -63,8 +69,11 @@ public class Enumerate implements HasPointer {
      * @param value   optional value of the sys attribute
      * @return 0 on success, otherwise a negative error value.
      */
-    public int addMatchSysattr(final String sysattr, final String value) {
-        return LibUdevJNI.enumerateAddMatchSysattr(getPointer(), sysattr, value);
+    public int addMatchSysattr(final String sysattr,
+                               final String value) {
+        return UdevLibrary.INSTANCE.udev_enumerate_add_match_sysattr(getPointer(),
+                                                                     sysattr,
+                                                                     value);
     }
 
     /**
@@ -74,8 +83,11 @@ public class Enumerate implements HasPointer {
      * @param value   optional value of the sys attribute
      * @return 0 on success, otherwise a negative error value.
      */
-    public int addNomatchSysattr(final String sysattr, final String value) {
-        return LibUdevJNI.enumerateAddNomatchSysattr(getPointer(), sysattr, value);
+    public int addNomatchSysattr(final String sysattr,
+                                 final String value) {
+        return UdevLibrary.INSTANCE.udev_enumerate_add_nomatch_sysattr(getPointer(),
+                                                                       sysattr,
+                                                                       value);
     }
 
     /**
@@ -85,8 +97,11 @@ public class Enumerate implements HasPointer {
      * @param value    value of the property
      * @return 0 on success, otherwise a negative error value.
      */
-    public int addMatchProperty(final String property, final String value) {
-        return LibUdevJNI.enumerateAddMatchProperty(getPointer(), property, value);
+    public int addMatchProperty(final String property,
+                                final String value) {
+        return UdevLibrary.INSTANCE.udev_enumerate_add_match_property(getPointer(),
+                                                                      property,
+                                                                      value);
     }
 
     /**
@@ -96,7 +111,8 @@ public class Enumerate implements HasPointer {
      * @return 0 on success, otherwise a negative error value.
      */
     public int addMatchSysname(final String sysname) {
-        return LibUdevJNI.enumerateAddMatchSysname(getPointer(), sysname);
+        return UdevLibrary.INSTANCE.udev_enumerate_add_match_sysname(getPointer(),
+                                                                     sysname);
     }
 
     /**
@@ -106,7 +122,8 @@ public class Enumerate implements HasPointer {
      * @return 0 on success, otherwise a negative error value.
      */
     public int addMatchTag(final String tag) {
-        return LibUdevJNI.enumerateAddMatchTag(getPointer(), tag);
+        return UdevLibrary.INSTANCE.udev_enumerate_add_match_tag(getPointer(),
+                                                                 tag);
     }
 
     /**
@@ -116,23 +133,24 @@ public class Enumerate implements HasPointer {
      * @return 0 on success, otherwise a negative error value.
      */
     public int addMatchParent(final Device parent) {
-        return LibUdevJNI.enumerateAddMatchParent(getPointer(), parent.getPointer());
+        return UdevLibrary.INSTANCE.udev_enumerate_add_match_parent(getPointer(),
+                                                                    parent.getPointer());
     }
 
     /**
      * Match only devices which udev has set up already. This makes sure, that the device node permissions and context
      * are properly set and that network devices are fully renamed.
-     * <p>
+     * <p/>
      * Usually, devices which are found in the kernel but not already handled by udev, have still pending events.
      * Services should subscribe to monitor events and wait for these devices to become ready,
      * instead of using uninitialized devices.
-     * <p>
+     * <p/>
      * For now, this will not affect devices which do not have a device node and are not network interfaces.
      *
      * @return 0 on success, otherwise a negative error value.
      */
     public int addMatchIsInitialized() {
-        return LibUdevJNI.enumerateAddMatchIsInitialized(getPointer());
+        return UdevLibrary.INSTANCE.udev_enumerate_add_match_is_initialized(getPointer());
     }
 
     /**
@@ -142,7 +160,8 @@ public class Enumerate implements HasPointer {
      * @return 0 on success, otherwise a negative error value.
      */
     public int addSyspath(final String syspath) {
-        return LibUdevJNI.enumerateAddSyspath(getPointer(), syspath);
+        return UdevLibrary.INSTANCE.udev_enumerate_add_syspath(getPointer(),
+                                                               syspath);
     }
 
     /**
@@ -151,7 +170,7 @@ public class Enumerate implements HasPointer {
      * @return 0 on success, otherwise a negative error value.
      */
     public int scanDevices() {
-        return LibUdevJNI.enumerateScanDevices(getPointer());
+        return UdevLibrary.INSTANCE.udev_enumerate_scan_devices(getPointer());
     }
 
     /**
@@ -160,7 +179,7 @@ public class Enumerate implements HasPointer {
      * @return 0 on success, otherwise a negative error value.
      */
     public int scanSubsystems() {
-        return LibUdevJNI.enumerateScanSubsystems(getPointer());
+        return UdevLibrary.INSTANCE.udev_enumerate_scan_subsystems(getPointer());
     }
 
     /**
@@ -169,7 +188,7 @@ public class Enumerate implements HasPointer {
      * @return a list entry.
      */
     public ListEntry getListEntry() {
-        return new ListEntry(LibUdevJNI.enumerateGetListEntry(getPointer()));
+        return new ListEntry(UdevLibrary.INSTANCE.udev_enumerate_get_list_entry(getPointer()));
     }
 
     @Override
@@ -181,20 +200,20 @@ public class Enumerate implements HasPointer {
             return false;
         }
 
-        final Enumerate enumerate = (Enumerate) o;
+        final Enumerate that = (Enumerate) o;
 
-        return pointer == enumerate.pointer;
+        return Pointer.nativeValue(pointer.getPointer()) == Pointer.nativeValue(that.pointer.getPointer());
 
     }
 
     @Override
     public int hashCode() {
-        return (int) (pointer);
+        return pointer.hashCode();
     }
 
     @Override
     protected void finalize() throws Throwable {
-        LibUdevJNI.enumerateUnref(getPointer());
+        UdevLibrary.INSTANCE.udev_enumerate_unref(getPointer());
         super.finalize();
     }
 }

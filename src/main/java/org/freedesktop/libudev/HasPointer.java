@@ -1,5 +1,5 @@
 package org.freedesktop.libudev;
 
-public interface HasPointer {
-    long getPointer();
+public interface HasPointer<T> {
+    T getPointer();
 }

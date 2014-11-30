@@ -1,8 +1,10 @@
 package org.freedesktop.libudev;
 
+import org.freedesktop.libudev.jna.UdevLibrary;
+
 /**
  * udev_util — utils
- * <p>
+ * <p/>
  * Utilities useful when dealing with devices and device node names.
  */
 public class UdevUtil {
@@ -14,7 +16,11 @@ public class UdevUtil {
      * @param len    maximum size of the output string, which may be four times as long as the input string
      * @return 0 if the entire string was copied, non-zero otherwise.
      */
-    public static int encodeString(final String str, final String strEnc, final int len) {
-        return LibUdevJNI.utilEncodeString(str, strEnc,len);
+    public static int encodeString(final String str,
+                                   final String strEnc,
+                                   final int len) {
+        return UdevLibrary.INSTANCE.udev_util_encode_string(str,
+                                                            strEnc,
+                                                            len);
     }
 }
