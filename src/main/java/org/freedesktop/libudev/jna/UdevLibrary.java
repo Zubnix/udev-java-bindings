@@ -1,10 +1,11 @@
 package org.freedesktop.libudev.jna;
 
 
+import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
-public interface UdevLibrary {
+public interface UdevLibrary extends Library {
     UdevLibrary INSTANCE = (UdevLibrary) Native.loadLibrary("udev",
                                                             UdevLibrary.class);
 
@@ -111,7 +112,7 @@ public interface UdevLibrary {
                                       String value);
 
     boolean udev_device_has_tag(StructUdevDevice udev_device,
-                            String tag);
+                                String tag);
 
     StructUdevMonitor udev_monitor_ref(StructUdevMonitor udev_monitor);
 
