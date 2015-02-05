@@ -1,222 +1,278 @@
 package org.freedesktop.libudev.jna;
 
-
-import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
-public interface UdevLibrary extends Library {
-    UdevLibrary INSTANCE = (UdevLibrary) Native.loadLibrary("udev",
-                                                            UdevLibrary.class);
+public class UdevLibrary implements UdevLibraryMapping{
 
-    StructUdev udev_ref(StructUdev udev);
+    private static UdevLibraryMapping INSTANCE;
 
-    StructUdev udev_unref(StructUdev udev);
+    public static UdevLibraryMapping INSTANCE() {
+        if (INSTANCE == null) {
+            Native.register(UdevLibraryMapping.JNA_LIBRARY_NAME);
+            INSTANCE = new UdevLibrary();
+        }
+        return INSTANCE;
+    }
 
-    StructUdev udev_new();
+    @Override
+    public native Pointer udev_ref(final Pointer udev);
 
-    void udev_set_log_fn(StructUdev udev,
-                         LogFunction logFn);
+    @Override
+    public native Pointer udev_unref(final Pointer udev);
 
-    int udev_get_log_priority(StructUdev udev);
+    @Override
+    public native Pointer udev_new();
 
-    void udev_set_log_priority(StructUdev udev,
-                               int priority);
+    @Override
+    public native void udev_set_log_fn(final Pointer udev, final LogFunction logFn);
 
-    Pointer udev_get_userdata(StructUdev udev);
+    @Override
+    public native int udev_get_log_priority(final Pointer udev);
 
-    void udev_set_userdata(StructUdev udev,
-                           Pointer userdata);
+    @Override
+    public native void udev_set_log_priority(final Pointer udev, final int priority);
 
-    StructUdevListEntry udev_list_entry_get_next(StructUdevListEntry list_entry);
+    @Override
+    public native Pointer udev_get_userdata(final Pointer udev);
 
-    StructUdevListEntry udev_list_entry_get_by_name(StructUdevListEntry list_entry,
-                                                    String name);
+    @Override
+    public native void udev_set_userdata(final Pointer udev, final Pointer userdata);
 
-    String udev_list_entry_get_name(StructUdevListEntry list_entry);
+    @Override
+    public native Pointer udev_list_entry_get_next(final Pointer list_entry);
 
-    String udev_list_entry_get_value(StructUdevListEntry list_entry);
+    @Override
+    public native Pointer udev_list_entry_get_by_name(final Pointer list_entry, final Pointer name);
 
-    StructUdevDevice udev_device_ref(StructUdevDevice udev_device);
+    @Override
+    public native Pointer udev_list_entry_get_name(final Pointer list_entry);
 
-    StructUdevDevice udev_device_unref(StructUdevDevice udev_device);
+    @Override
+    public native Pointer udev_list_entry_get_value(final Pointer list_entry);
 
-    StructUdev udev_device_get_udev(StructUdevDevice udev_device);
+    @Override
+    public native Pointer udev_device_ref(final Pointer udev_device);
 
-    StructUdevDevice udev_device_new_from_syspath(StructUdev udev,
-                                                  String syspath);
+    @Override
+    public native Pointer udev_device_unref(final Pointer udev_device);
 
-    StructUdevDevice udev_device_new_from_devnum(StructUdev udev,
-                                                 byte type,
-                                                 int devnum);
+    @Override
+    public native Pointer udev_device_get_udev(final Pointer udev_device);
 
-    StructUdevDevice udev_device_new_from_subsystem_sysname(StructUdev udev,
-                                                            String subsystem,
-                                                            String sysname);
+    @Override
+    public native Pointer udev_device_new_from_syspath(final Pointer udev, final Pointer syspath);
 
-    StructUdevDevice udev_device_new_from_device_id(StructUdev udev,
-                                                    String id);
+    @Override
+    public native Pointer udev_device_new_from_devnum(final Pointer udev, final byte type, final int devnum);
 
-    StructUdevDevice udev_device_new_from_environment(StructUdev udev);
+    @Override
+    public native Pointer udev_device_new_from_subsystem_sysname(final Pointer udev, final Pointer subsystem,
+                                                          final Pointer sysname);
 
-    /* udev_device_get_parent_*() does not take a reference on the returned device, it is automatically unref'd with the parent */
-    StructUdevDevice udev_device_get_parent(StructUdevDevice udev_device);
+    @Override
+    public native Pointer udev_device_new_from_device_id(final Pointer udev, final Pointer id);
 
-    StructUdevDevice udev_device_get_parent_with_subsystem_devtype(StructUdevDevice udev_device,
-                                                                   String subsystem,
-                                                                   String devtype);
+    @Override
+    public native Pointer udev_device_new_from_environment(final Pointer udev);
 
-    /* retrieve device properties */
-    String udev_device_get_devpath(StructUdevDevice udev_device);
+    @Override
+    public native Pointer udev_device_get_parent(final Pointer udev_device);
 
-    String udev_device_get_subsystem(StructUdevDevice udev_device);
+    @Override
+    public native Pointer udev_device_get_parent_with_subsystem_devtype(final Pointer udev_device, final Pointer subsystem,
+                                                                 final Pointer devtype);
 
-    String udev_device_get_devtype(StructUdevDevice udev_device);
+    @Override
+    public native Pointer udev_device_get_devpath(final Pointer udev_device);
 
-    String udev_device_get_syspath(StructUdevDevice udev_device);
+    @Override
+    public native Pointer udev_device_get_subsystem(final Pointer udev_device);
 
-    String udev_device_get_sysname(StructUdevDevice udev_device);
+    @Override
+    public native Pointer udev_device_get_devtype(final Pointer udev_device);
 
-    String udev_device_get_sysnum(StructUdevDevice udev_device);
+    @Override
+    public native Pointer udev_device_get_syspath(final Pointer udev_device);
 
-    String udev_device_get_devnode(StructUdevDevice udev_device);
+    @Override
+    public native Pointer udev_device_get_sysname(final Pointer udev_device);
 
-    boolean udev_device_get_is_initialized(StructUdevDevice udev_device);
+    @Override
+    public native Pointer udev_device_get_sysnum(final Pointer udev_device);
 
-    StructUdevListEntry udev_device_get_devlinks_list_entry(StructUdevDevice udev_device);
+    @Override
+    public native Pointer udev_device_get_devnode(final Pointer udev_device);
 
-    StructUdevListEntry udev_device_get_properties_list_entry(StructUdevDevice udev_device);
+    @Override
+    public native boolean udev_device_get_is_initialized(final Pointer udev_device);
 
-    StructUdevListEntry udev_device_get_tags_list_entry(StructUdevDevice udev_device);
+    @Override
+    public native Pointer udev_device_get_devlinks_list_entry(final Pointer udev_device);
 
-    StructUdevListEntry udev_device_get_sysattr_list_entry(StructUdevDevice udev_device);
+    @Override
+    public native Pointer udev_device_get_properties_list_entry(final Pointer udev_device);
 
-    String udev_device_get_property_value(StructUdevDevice udev_device,
-                                          String key);
+    @Override
+    public native Pointer udev_device_get_tags_list_entry(final Pointer udev_device);
 
-    String udev_device_get_driver(StructUdevDevice udev_device);
+    @Override
+    public native Pointer udev_device_get_sysattr_list_entry(final Pointer udev_device);
 
-    int udev_device_get_devnum(StructUdevDevice udev_device);
+    @Override
+    public native Pointer udev_device_get_property_value(final Pointer udev_device, final Pointer key);
 
-    String udev_device_get_action(StructUdevDevice udev_device);
+    @Override
+    public native Pointer udev_device_get_driver(final Pointer udev_device);
 
-    long udev_device_get_seqnum(StructUdevDevice udev_device);
+    @Override
+    public native int udev_device_get_devnum(final Pointer udev_device);
 
-    long udev_device_get_usec_since_initialized(StructUdevDevice udev_device);
+    @Override
+    public native Pointer udev_device_get_action(final Pointer udev_device);
 
-    String udev_device_get_sysattr_value(StructUdevDevice udev_device,
-                                         String sysattr);
+    @Override
+    public native long udev_device_get_seqnum(final Pointer udev_device);
 
-    int udev_device_set_sysattr_value(StructUdevDevice udev_device,
-                                      String sysattr,
-                                      String value);
+    @Override
+    public native long udev_device_get_usec_since_initialized(final Pointer udev_device);
 
-    boolean udev_device_has_tag(StructUdevDevice udev_device,
-                                String tag);
+    @Override
+    public native Pointer udev_device_get_sysattr_value(final Pointer udev_device, final Pointer sysattr);
 
-    StructUdevMonitor udev_monitor_ref(StructUdevMonitor udev_monitor);
+    @Override
+    public native int udev_device_set_sysattr_value(final Pointer udev_device, final Pointer sysattr, final Pointer value);
 
-    StructUdevMonitor udev_monitor_unref(StructUdevMonitor udev_monitor);
+    @Override
+    public native boolean udev_device_has_tag(final Pointer udev_device, final Pointer tag);
 
-    StructUdev udev_monitor_get_udev(StructUdevMonitor udev_monitor);
+    @Override
+    public native Pointer udev_monitor_ref(final Pointer udev_monitor);
 
-    StructUdevMonitor udev_monitor_new_from_netlink(StructUdev udev,
-                                                    String name);
+    @Override
+    public native Pointer udev_monitor_unref(final Pointer udev_monitor);
 
-    int udev_monitor_enable_receiving(StructUdevMonitor udev_monitor);
+    @Override
+    public native Pointer udev_monitor_get_udev(final Pointer udev_monitor);
 
-    int udev_monitor_set_receive_buffer_size(StructUdevMonitor udev_monitor,
-                                             int size);
+    @Override
+    public native Pointer udev_monitor_new_from_netlink(final Pointer udev, final Pointer name);
 
-    int udev_monitor_get_fd(StructUdevMonitor udev_monitor);
+    @Override
+    public native int udev_monitor_enable_receiving(final Pointer udev_monitor);
 
-    StructUdevDevice udev_monitor_receive_device(StructUdevMonitor udev_monitor);
+    @Override
+    public native int udev_monitor_set_receive_buffer_size(final Pointer udev_monitor, final int size);
 
-    int udev_monitor_filter_add_match_subsystem_devtype(StructUdevMonitor udev_monitor,
-                                                        String subsystem,
-                                                        String devtype);
+    @Override
+    public native int udev_monitor_get_fd(final Pointer udev_monitor);
 
-    int udev_monitor_filter_add_match_tag(StructUdevMonitor udev_monitor,
-                                          String tag);
+    @Override
+    public native Pointer udev_monitor_receive_device(final Pointer udev_monitor);
 
-    int udev_monitor_filter_update(StructUdevMonitor udev_monitor);
+    @Override
+    public native int udev_monitor_filter_add_match_subsystem_devtype(final Pointer udev_monitor, final Pointer subsystem,
+                                                               final Pointer devtype);
 
-    int udev_monitor_filter_remove(StructUdevMonitor udev_monitor);
+    @Override
+    public native int udev_monitor_filter_add_match_tag(final Pointer udev_monitor, final Pointer tag);
 
-    StructUdevEnumerate udev_enumerate_ref(StructUdevEnumerate udev_enumerate);
+    @Override
+    public native int udev_monitor_filter_update(final Pointer udev_monitor);
 
-    StructUdevEnumerate udev_enumerate_unref(StructUdevEnumerate udev_enumerate);
+    @Override
+    public native int udev_monitor_filter_remove(final Pointer udev_monitor);
 
-    StructUdev udev_enumerate_get_udev(StructUdevEnumerate udev_enumerate);
+    @Override
+    public native Pointer udev_enumerate_ref(final Pointer udev_enumerate);
 
-    StructUdevEnumerate udev_enumerate_new(StructUdev udev);
+    @Override
+    public native Pointer udev_enumerate_unref(final Pointer udev_enumerate);
 
-    int udev_enumerate_add_match_subsystem(StructUdevEnumerate udev_enumerate,
-                                           String subsystem);
+    @Override
+    public native Pointer udev_enumerate_get_udev(final Pointer udev_enumerate);
 
-    int udev_enumerate_add_nomatch_subsystem(StructUdevEnumerate udev_enumerate,
-                                             String subsystem);
+    @Override
+    public native Pointer udev_enumerate_new(final Pointer udev);
 
-    int udev_enumerate_add_match_sysattr(StructUdevEnumerate udev_enumerate,
-                                         String sysattr,
-                                         String value);
+    @Override
+    public native int udev_enumerate_add_match_subsystem(final Pointer udev_enumerate, final Pointer subsystem);
 
-    int udev_enumerate_add_nomatch_sysattr(StructUdevEnumerate udev_enumerate,
-                                           String sysattr,
-                                           String value);
+    @Override
+    public native int udev_enumerate_add_nomatch_subsystem(final Pointer udev_enumerate, final Pointer subsystem);
 
-    int udev_enumerate_add_match_property(StructUdevEnumerate udev_enumerate,
-                                          String property,
-                                          String value);
+    @Override
+    public native int udev_enumerate_add_match_sysattr(final Pointer udev_enumerate, final Pointer sysattr,
+                                                final Pointer value);
 
-    int udev_enumerate_add_match_sysname(StructUdevEnumerate udev_enumerate,
-                                         String sysname);
+    @Override
+    public native int udev_enumerate_add_nomatch_sysattr(final Pointer udev_enumerate, final Pointer sysattr,
+                                                  final Pointer value);
 
-    int udev_enumerate_add_match_tag(StructUdevEnumerate udev_enumerate,
-                                     String tag);
+    @Override
+    public native int udev_enumerate_add_match_property(final Pointer udev_enumerate, final Pointer property,
+                                                 final Pointer value);
 
-    int udev_enumerate_add_match_parent(StructUdevEnumerate udev_enumerate,
-                                        StructUdevDevice parent);
+    @Override
+    public native int udev_enumerate_add_match_sysname(final Pointer udev_enumerate, final Pointer sysname);
 
-    int udev_enumerate_add_match_is_initialized(StructUdevEnumerate udev_enumerate);
+    @Override
+    public native int udev_enumerate_add_match_tag(final Pointer udev_enumerate, final Pointer tag);
 
-    int udev_enumerate_add_syspath(StructUdevEnumerate udev_enumerate,
-                                   String syspath);
+    @Override
+    public native int udev_enumerate_add_match_parent(final Pointer udev_enumerate, final Pointer parent);
 
-    int udev_enumerate_scan_devices(StructUdevEnumerate udev_enumerate);
+    @Override
+    public native int udev_enumerate_add_match_is_initialized(final Pointer udev_enumerate);
 
-    int udev_enumerate_scan_subsystems(StructUdevEnumerate udev_enumerate);
+    @Override
+    public native int udev_enumerate_add_syspath(final Pointer udev_enumerate, final Pointer syspath);
 
-    StructUdevListEntry udev_enumerate_get_list_entry(StructUdevEnumerate udev_enumerate);
+    @Override
+    public native int udev_enumerate_scan_devices(final Pointer udev_enumerate);
 
-    StructUdevQueue udev_queue_ref(StructUdevQueue udev_queue);
+    @Override
+    public native int udev_enumerate_scan_subsystems(final Pointer udev_enumerate);
 
-    StructUdevQueue udev_queue_unref(StructUdevQueue udev_queue);
+    @Override
+    public native Pointer udev_enumerate_get_list_entry(final Pointer udev_enumerate);
 
-    StructUdev udev_queue_get_udev(StructUdevQueue udev_queue);
+    @Override
+    public native Pointer udev_queue_ref(final Pointer udev_queue);
 
-    StructUdevQueue udev_queue_new(StructUdev udev);
+    @Override
+    public native Pointer udev_queue_unref(final Pointer udev_queue);
 
-    boolean udev_queue_get_udev_is_active(StructUdevQueue udev_queue);
+    @Override
+    public native Pointer udev_queue_get_udev(final Pointer udev_queue);
 
-    boolean udev_queue_get_queue_is_empty(StructUdevQueue udev_queue);
+    @Override
+    public native Pointer udev_queue_new(final Pointer udev);
 
-    int udev_queue_get_fd(StructUdevQueue udev_queue);
+    @Override
+    public native boolean udev_queue_get_udev_is_active(final Pointer udev_queue);
 
-    int udev_queue_flush(StructUdevQueue udev_queue);
+    @Override
+    public native boolean udev_queue_get_queue_is_empty(final Pointer udev_queue);
 
-    StructUdevHwdb udev_hwdb_new(StructUdev udev);
+    @Override
+    public native int udev_queue_get_fd(final Pointer udev_queue);
 
-    StructUdevHwdb udev_hwdb_ref(StructUdevHwdb hwdb);
+    @Override
+    public native int udev_queue_flush(final Pointer udev_queue);
 
-    StructUdevHwdb udev_hwdb_unref(StructUdevHwdb hwdb);
+    @Override
+    public native Pointer udev_hwdb_new(final Pointer udev);
 
-    StructUdevListEntry udev_hwdb_get_properties_list_entry(StructUdevHwdb hwdb,
-                                                            String modalias,
-                                                            int flags);
+    @Override
+    public native Pointer udev_hwdb_ref(final Pointer hwdb);
 
-    int udev_util_encode_string(String str,
-                                String str_enc,
-                                int len);
+    @Override
+    public native Pointer udev_hwdb_unref(final Pointer hwdb);
 
+    @Override
+    public native Pointer udev_hwdb_get_properties_list_entry(final Pointer hwdb, final Pointer modalias, final int flags);
+
+    @Override
+    public native int udev_util_encode_string(final Pointer str, final Pointer str_enc, final int len);
 }

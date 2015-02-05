@@ -1,5 +1,7 @@
 package org.freedesktop.libudev;
 
-public interface HasPointer<T> {
-    T getPointer();
+import com.sun.jna.Pointer;
+
+public interface HasPointer {
+    Pointer getPointer();
 }

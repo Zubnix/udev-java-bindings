@@ -1,7 +1,8 @@
 package org.freedesktop.libudev;
 
 import com.sun.jna.Pointer;
-import org.freedesktop.libudev.jna.StructUdevDevice;
+
+import org.freedesktop.libudev.jna.StringUtil;
 import org.freedesktop.libudev.jna.UdevLibrary;
 
 /**
@@ -13,7 +14,7 @@ import org.freedesktop.libudev.jna.UdevLibrary;
  * every device has exactly one path in the kernel sys filesystem.
  * Devices usually belong to a kernel subsystem, and have a unique name inside that subsystem.
  */
-public class Device implements HasPointer<StructUdevDevice> {
+public class Device implements HasPointer {
 
     /**
      * Create new udev device, and fill in information from the sys device and the udev database entry.
@@ -26,8 +27,8 @@ public class Device implements HasPointer<StructUdevDevice> {
     public static Device newFromSyspath(final LibUdev udev,
                                         final String syspath) {
 
-        final StructUdevDevice devicePointer = UdevLibrary.INSTANCE.udev_device_new_from_syspath(udev.getPointer(),
-                                                                                                 syspath);
+        final Pointer devicePointer = UdevLibrary.INSTANCE().udev_device_new_from_syspath(udev.getPointer(),
+                                                                                          StringUtil.asPointer(syspath));
         if (devicePointer == null) {
             return null;
         }
@@ -49,7 +50,7 @@ public class Device implements HasPointer<StructUdevDevice> {
     public static Device newFromDevnum(final LibUdev udev,
                                        final byte type,
                                        final int devnum) {
-        final StructUdevDevice devicePointer = UdevLibrary.INSTANCE.udev_device_new_from_devnum(udev.getPointer(),
+        final Pointer devicePointer = UdevLibrary.INSTANCE().udev_device_new_from_devnum(udev.getPointer(),
                                                                                                 type,
                                                                                                 devnum);
         if (devicePointer == null) {
@@ -73,9 +74,9 @@ public class Device implements HasPointer<StructUdevDevice> {
     public static Device newFromSubsystemSysname(final LibUdev udev,
                                                  final String subsystem,
                                                  final String sysname) {
-        final StructUdevDevice devicePointer = UdevLibrary.INSTANCE.udev_device_new_from_subsystem_sysname(udev.getPointer(),
-                                                                                                           subsystem,
-                                                                                                           sysname);
+        final Pointer devicePointer = UdevLibrary.INSTANCE().udev_device_new_from_subsystem_sysname(udev.getPointer(),
+                                                                                                    StringUtil.asPointer(subsystem),
+                                                                                                    StringUtil.asPointer(sysname));
         if (devicePointer == null) {
             return null;
         }
@@ -95,8 +96,8 @@ public class Device implements HasPointer<StructUdevDevice> {
      */
     public static Device newFromDeviceId(final LibUdev udev,
                                          final String id) {
-        final StructUdevDevice devicePointer = UdevLibrary.INSTANCE.udev_device_new_from_device_id(udev.getPointer(),
-                                                                                                   id);
+        final Pointer devicePointer = UdevLibrary.INSTANCE().udev_device_new_from_device_id(udev.getPointer(),
+                                                                                            StringUtil.asPointer(id));
         if (devicePointer == null) {
             return null;
         }
@@ -114,7 +115,7 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return a new udev device, or NULL, if it does not exist
      */
     public static Device newFromEnvironment(final LibUdev udev) {
-        final StructUdevDevice devicePointer = UdevLibrary.INSTANCE.udev_device_new_from_environment(udev.getPointer());
+        final Pointer devicePointer = UdevLibrary.INSTANCE().udev_device_new_from_environment(udev.getPointer());
         if (devicePointer == null) {
             return null;
         }
@@ -123,14 +124,14 @@ public class Device implements HasPointer<StructUdevDevice> {
         }
     }
 
-    private final StructUdevDevice pointer;
+    private final Pointer pointer;
 
-    public Device(final StructUdevDevice pointer) {
+    public Device(final Pointer pointer) {
         this.pointer = pointer;
     }
 
     @Override
-    public StructUdevDevice getPointer() {
+    public Pointer getPointer() {
         return this.pointer;
     }
 
@@ -140,7 +141,7 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return the udev library context
      */
     public LibUdev getUdev() {
-        return new LibUdev(UdevLibrary.INSTANCE.udev_ref(UdevLibrary.INSTANCE.udev_device_get_udev(getPointer())));
+        return new LibUdev(UdevLibrary.INSTANCE().udev_ref(UdevLibrary.INSTANCE().udev_device_get_udev(getPointer())));
     }
 
     /**
@@ -151,7 +152,7 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return a new udev device, or NULL, if it no parent exist.
      */
     public Device getParent() {
-        final StructUdevDevice devicePointer = UdevLibrary.INSTANCE.udev_device_get_parent(getPointer());
+        final Pointer devicePointer = UdevLibrary.INSTANCE().udev_device_get_parent(getPointer());
         if (devicePointer == null) {
             return null;
         }
@@ -172,9 +173,9 @@ public class Device implements HasPointer<StructUdevDevice> {
      */
     public Device getParentWithSubsystemDevtype(final String subsystem,
                                                 final String devtype) {
-        final StructUdevDevice devicePointer = UdevLibrary.INSTANCE.udev_device_get_parent_with_subsystem_devtype(getPointer(),
-                                                                                                                  subsystem,
-                                                                                                                  devtype);
+        final Pointer devicePointer = UdevLibrary.INSTANCE().udev_device_get_parent_with_subsystem_devtype(getPointer(),
+                                                                                                           StringUtil.asPointer(subsystem),
+                                                                                                           StringUtil.asPointer(devtype));
         if (devicePointer == null) {
             return null;
         }
@@ -191,7 +192,7 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return the devpath of the udev device
      */
     public String getDevpath() {
-        return UdevLibrary.INSTANCE.udev_device_get_devpath(getPointer());
+        return StringUtil.fromPointer(UdevLibrary.INSTANCE().udev_device_get_devpath(getPointer()));
     }
 
     /**
@@ -200,7 +201,7 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return the subsystem name of the udev device, or NULL if it can not be determined
      */
     public String getSubsystem() {
-        return UdevLibrary.INSTANCE.udev_device_get_subsystem(getPointer());
+        return StringUtil.fromPointer(UdevLibrary.INSTANCE().udev_device_get_subsystem(getPointer()));
     }
 
     /**
@@ -209,7 +210,7 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return the devtype name of the udev device, or NULL if it can not be determined
      */
     public String getDevtype() {
-        return UdevLibrary.INSTANCE.udev_device_get_devtype(getPointer());
+        return StringUtil.fromPointer(UdevLibrary.INSTANCE().udev_device_get_devtype(getPointer()));
     }
 
     /**
@@ -218,7 +219,7 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return the sys path of the udev device
      */
     public String getSyspath() {
-        return UdevLibrary.INSTANCE.udev_device_get_syspath(getPointer());
+        return StringUtil.fromPointer(UdevLibrary.INSTANCE().udev_device_get_syspath(getPointer()));
     }
 
     /**
@@ -227,7 +228,7 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return the name string of the device
      */
     public String getSysname() {
-        return UdevLibrary.INSTANCE.udev_device_get_sysname(getPointer());
+        return StringUtil.fromPointer(UdevLibrary.INSTANCE().udev_device_get_sysname(getPointer()));
     }
 
     /**
@@ -236,7 +237,7 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return the trailing number string of the device name
      */
     public String getSysnum() {
-        return UdevLibrary.INSTANCE.udev_device_get_sysnum(getPointer());
+        return StringUtil.fromPointer(UdevLibrary.INSTANCE().udev_device_get_sysnum(getPointer()));
     }
 
     /**
@@ -246,7 +247,7 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return the device node file name of the udev device, or NULL if no device node exists
      */
     public String getDevnode() {
-        return UdevLibrary.INSTANCE.udev_device_get_devnode(getPointer());
+        return StringUtil.fromPointer(UdevLibrary.INSTANCE().udev_device_get_devnode(getPointer()));
     }
 
     /**
@@ -259,7 +260,7 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return true if the device is set up. false otherwise.
      */
     public boolean isInitialized() {
-        return UdevLibrary.INSTANCE.udev_device_get_is_initialized(getPointer());
+        return UdevLibrary.INSTANCE().udev_device_get_is_initialized(getPointer());
     }
 
     /**
@@ -272,7 +273,7 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return the first entry of the device node link list
      */
     public ListEntry getDevlinks() {
-        return new ListEntry(UdevLibrary.INSTANCE.udev_device_get_devlinks_list_entry(getPointer()));
+        return new ListEntry(UdevLibrary.INSTANCE().udev_device_get_devlinks_list_entry(getPointer()));
     }
 
     /**
@@ -285,7 +286,7 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return the first entry of the property list
      */
     public ListEntry getProperties() {
-        return new ListEntry(UdevLibrary.INSTANCE.udev_device_get_properties_list_entry(getPointer()));
+        return new ListEntry(UdevLibrary.INSTANCE().udev_device_get_properties_list_entry(getPointer()));
     }
 
     /**
@@ -296,7 +297,7 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return the first entry of the tag list
      */
     public ListEntry getTags() {
-        return new ListEntry(UdevLibrary.INSTANCE.udev_device_get_tags_list_entry(getPointer()));
+        return new ListEntry(UdevLibrary.INSTANCE().udev_device_get_tags_list_entry(getPointer()));
     }
 
     /**
@@ -306,7 +307,7 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return the first entry of the property list
      */
     public ListEntry getSysattr() {
-        return new ListEntry(UdevLibrary.INSTANCE.udev_device_get_sysattr_list_entry(getPointer()));
+        return new ListEntry(UdevLibrary.INSTANCE().udev_device_get_sysattr_list_entry(getPointer()));
     }
 
     /**
@@ -314,22 +315,22 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return the value of a device property, or NULL if there is no such property.
      */
     public String getPropertyValue(final String key) {
-        return UdevLibrary.INSTANCE.udev_device_get_property_value(getPointer(),
-                                                                   key);
+        return StringUtil.fromPointer(UdevLibrary.INSTANCE().udev_device_get_property_value(getPointer(),
+                                                                                            StringUtil.asPointer(key)));
     }
 
     /**
      * @return the driver string, or NULL if there is no driver attached.
      */
     public String getDriver() {
-        return UdevLibrary.INSTANCE.udev_device_get_driver(getPointer());
+        return StringUtil.fromPointer(UdevLibrary.INSTANCE().udev_device_get_driver(getPointer()));
     }
 
     /**
      * @return the device major/minor number.
      */
     public long getDevnum() {
-        return UdevLibrary.INSTANCE.udev_device_get_devnum(getPointer());
+        return UdevLibrary.INSTANCE().udev_device_get_devnum(getPointer());
     }
 
     /**
@@ -339,7 +340,7 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return the kernel action value, or NULL if there is no action value available.
      */
     public String getAction() {
-        return UdevLibrary.INSTANCE.udev_device_get_action(getPointer());
+        return StringUtil.fromPointer(UdevLibrary.INSTANCE().udev_device_get_action(getPointer()));
     }
 
     /**
@@ -349,7 +350,7 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return the kernel event sequence number, or 0 if there is no sequence number available.
      */
     public long getSegnum() {
-        return UdevLibrary.INSTANCE.udev_device_get_seqnum(getPointer());
+        return UdevLibrary.INSTANCE().udev_device_get_seqnum(getPointer());
     }
 
     /**
@@ -360,7 +361,7 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return he number of microseconds since the device was first seen.
      */
     public long getUsecSinceInitialized() {
-        return UdevLibrary.INSTANCE.udev_device_get_usec_since_initialized(getPointer());
+        return UdevLibrary.INSTANCE().udev_device_get_usec_since_initialized(getPointer());
     }
 
     /**
@@ -371,8 +372,9 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return The content of a sys attribute file, or NULL if there is no sys attribute value.
      */
     public String getSysattrValue(final String sysattr) {
-        return UdevLibrary.INSTANCE.udev_device_get_sysattr_value(getPointer(),
-                                                                  sysattr);
+        return StringUtil.fromPointer(UdevLibrary.INSTANCE().udev_device_get_sysattr_value(getPointer(),
+                                                                                           StringUtil
+                                                                                                   .asPointer(sysattr)));
     }
 
     /**
@@ -384,9 +386,9 @@ public class Device implements HasPointer<StructUdevDevice> {
      */
     public int setSysattrValue(final String sysattr,
                                final String value) {
-        return UdevLibrary.INSTANCE.udev_device_set_sysattr_value(getPointer(),
-                                                                  sysattr,
-                                                                  value);
+        return UdevLibrary.INSTANCE().udev_device_set_sysattr_value(getPointer(),
+                                                                    StringUtil.asPointer(sysattr),
+                                                                    StringUtil.asPointer(value));
     }
 
     /**
@@ -396,8 +398,8 @@ public class Device implements HasPointer<StructUdevDevice> {
      * @return true if the tag is found. false otherwise.
      */
     public boolean hasTag(final String tag) {
-        return UdevLibrary.INSTANCE.udev_device_has_tag(getPointer(),
-                                                        tag);
+        return UdevLibrary.INSTANCE().udev_device_has_tag(getPointer(),
+                                                          StringUtil.asPointer(tag));
     }
 
     @Override
@@ -411,7 +413,7 @@ public class Device implements HasPointer<StructUdevDevice> {
 
         final Device that = (Device) o;
 
-        return Pointer.nativeValue(pointer.getPointer()) == Pointer.nativeValue(that.pointer.getPointer());
+        return pointer.equals(that.pointer);
 
     }
 
@@ -422,7 +424,7 @@ public class Device implements HasPointer<StructUdevDevice> {
 
     @Override
     protected void finalize() throws Throwable {
-        UdevLibrary.INSTANCE.udev_device_unref(getPointer());
+        UdevLibrary.INSTANCE().udev_device_unref(getPointer());
         super.finalize();
     }
 }

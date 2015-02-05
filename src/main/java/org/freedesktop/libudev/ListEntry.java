@@ -2,7 +2,8 @@ package org.freedesktop.libudev;
 
 
 import com.sun.jna.Pointer;
-import org.freedesktop.libudev.jna.StructUdevListEntry;
+
+import org.freedesktop.libudev.jna.StringUtil;
 import org.freedesktop.libudev.jna.UdevLibrary;
 
 /**
@@ -12,16 +13,16 @@ import org.freedesktop.libudev.jna.UdevLibrary;
  * Opaque object representing one entry in a list.
  * An entry contains a name, and optionally a value.
  */
-public class ListEntry implements HasPointer<StructUdevListEntry> {
+public class ListEntry implements HasPointer {
 
-    private final StructUdevListEntry pointer;
+    private final Pointer pointer;
 
-    public ListEntry(final StructUdevListEntry pointer) {
+    public ListEntry(final Pointer pointer) {
         this.pointer = pointer;
     }
 
     @Override
-    public StructUdevListEntry getPointer() {
+    public Pointer getPointer() {
         return this.pointer;
     }
 
@@ -29,7 +30,7 @@ public class ListEntry implements HasPointer<StructUdevListEntry> {
      * @return the next entry from the list, NULL is no more entries are found.
      */
     public ListEntry getNext() {
-        final StructUdevListEntry listEntryPointer = UdevLibrary.INSTANCE.udev_list_entry_get_next(getPointer());
+        final Pointer listEntryPointer = UdevLibrary.INSTANCE().udev_list_entry_get_next(getPointer());
         if (listEntryPointer == null) {
             return null;
         }
@@ -43,8 +44,8 @@ public class ListEntry implements HasPointer<StructUdevListEntry> {
      * @return the entry where name matched, NULL if no matching entry is found.
      */
     public ListEntry getByName(String name) {
-        final StructUdevListEntry listEntryPointer = UdevLibrary.INSTANCE.udev_list_entry_get_by_name(getPointer(),
-                                                                                                      name);
+        final Pointer listEntryPointer = UdevLibrary.INSTANCE().udev_list_entry_get_by_name(getPointer(),
+                                                                                            StringUtil.asPointer(name));
         if (listEntryPointer == null) {
             return null;
         }
@@ -57,14 +58,14 @@ public class ListEntry implements HasPointer<StructUdevListEntry> {
      * @return the name string of this entry.
      */
     public String getName() {
-        return UdevLibrary.INSTANCE.udev_list_entry_get_name(getPointer());
+        return StringUtil.fromPointer(UdevLibrary.INSTANCE().udev_list_entry_get_name(getPointer()));
     }
 
     /**
      * @return the value string of this entry.
      */
     public String getValue() {
-        return UdevLibrary.INSTANCE.udev_list_entry_get_value(getPointer());
+        return StringUtil.fromPointer(UdevLibrary.INSTANCE().udev_list_entry_get_value(getPointer()));
     }
 
     @Override
@@ -78,7 +79,7 @@ public class ListEntry implements HasPointer<StructUdevListEntry> {
 
         final ListEntry that = (ListEntry) o;
 
-        return Pointer.nativeValue(pointer.getPointer()) == Pointer.nativeValue(that.pointer.getPointer());
+        return pointer.equals(that.pointer);
     }
 
     @Override

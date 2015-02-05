@@ -1,8 +1,8 @@
 package org.freedesktop.libudev;
 
 import com.sun.jna.Pointer;
-import org.freedesktop.libudev.jna.StructUdevDevice;
-import org.freedesktop.libudev.jna.StructUdevMonitor;
+
+import org.freedesktop.libudev.jna.StringUtil;
 import org.freedesktop.libudev.jna.UdevLibrary;
 
 /**
@@ -10,16 +10,16 @@ import org.freedesktop.libudev.jna.UdevLibrary;
  * <p/>
  * Connects to a device event source.
  */
-public class Monitor implements HasPointer<StructUdevMonitor> {
+public class Monitor implements HasPointer {
 
-    private final StructUdevMonitor pointer;
+    private final Pointer pointer;
 
-    public Monitor(final StructUdevMonitor pointer) {
+    public Monitor(final Pointer pointer) {
         this.pointer = pointer;
     }
 
     @Override
-    public StructUdevMonitor getPointer() {
+    public Pointer getPointer() {
         return pointer;
     }
 
@@ -38,8 +38,8 @@ public class Monitor implements HasPointer<StructUdevMonitor> {
      */
     public static Monitor newFromNetlink(final LibUdev udev,
                                          final String name) {
-        final StructUdevMonitor monitorPointer = UdevLibrary.INSTANCE.udev_monitor_new_from_netlink(udev.getPointer(),
-                                                                                                    name);
+        final Pointer monitorPointer = UdevLibrary.INSTANCE().udev_monitor_new_from_netlink(udev.getPointer(),
+                                                                                            StringUtil.asPointer(name));
         if (monitorPointer == null) {
             return null;
         }
@@ -54,7 +54,7 @@ public class Monitor implements HasPointer<StructUdevMonitor> {
      * @return the udev library context
      */
     public LibUdev getUdev() {
-        return new LibUdev(UdevLibrary.INSTANCE.udev_ref(UdevLibrary.INSTANCE.udev_monitor_get_udev(getPointer())));
+        return new LibUdev(UdevLibrary.INSTANCE().udev_ref(UdevLibrary.INSTANCE().udev_monitor_get_udev(getPointer())));
     }
 
     /**
@@ -63,7 +63,7 @@ public class Monitor implements HasPointer<StructUdevMonitor> {
      * @return 0 on success, otherwise a negative error value.
      */
     public int enableReceiving() {
-        return UdevLibrary.INSTANCE.udev_monitor_enable_receiving(getPointer());
+        return UdevLibrary.INSTANCE().udev_monitor_enable_receiving(getPointer());
     }
 
     /**
@@ -73,8 +73,8 @@ public class Monitor implements HasPointer<StructUdevMonitor> {
      * @return 0 on success, otherwise -1 on error.
      */
     public int setReceiveBufferSize(final int size) {
-        return UdevLibrary.INSTANCE.udev_monitor_set_receive_buffer_size(getPointer(),
-                                                                         size);
+        return UdevLibrary.INSTANCE().udev_monitor_set_receive_buffer_size(getPointer(),
+                                                                           size);
     }
 
     /**
@@ -83,7 +83,7 @@ public class Monitor implements HasPointer<StructUdevMonitor> {
      * @return the socket file descriptor
      */
     public int getFd() {
-        return UdevLibrary.INSTANCE.udev_monitor_get_fd(getPointer());
+        return UdevLibrary.INSTANCE().udev_monitor_get_fd(getPointer());
     }
 
     /**
@@ -98,7 +98,7 @@ public class Monitor implements HasPointer<StructUdevMonitor> {
      * @return a new udev device, or NULL, in case of an error
      */
     public Device receiveDevice() {
-        final StructUdevDevice devicePointer = UdevLibrary.INSTANCE.udev_monitor_receive_device(getPointer());
+        final Pointer devicePointer = UdevLibrary.INSTANCE().udev_monitor_receive_device(getPointer());
         if (devicePointer == null) {
             return null;
         }
@@ -118,9 +118,9 @@ public class Monitor implements HasPointer<StructUdevMonitor> {
      */
     public int addMatchSubsystemDevtype(final String subsystem,
                                         final String devtype) {
-        return UdevLibrary.INSTANCE.udev_monitor_filter_add_match_subsystem_devtype(getPointer(),
-                                                                                    subsystem,
-                                                                                    devtype);
+        return UdevLibrary.INSTANCE().udev_monitor_filter_add_match_subsystem_devtype(getPointer(),
+                                                                                      StringUtil.asPointer(subsystem),
+                                                                                      StringUtil.asPointer(devtype));
     }
 
     /**
@@ -132,8 +132,8 @@ public class Monitor implements HasPointer<StructUdevMonitor> {
      * @return 0 on success, otherwise a negative error value.
      */
     public int addMatchTag(final String tag) {
-        return UdevLibrary.INSTANCE.udev_monitor_filter_add_match_tag(getPointer(),
-                                                                      tag);
+        return UdevLibrary.INSTANCE().udev_monitor_filter_add_match_tag(getPointer(),
+                                                                        StringUtil.asPointer(tag));
     }
 
     /**
@@ -142,7 +142,7 @@ public class Monitor implements HasPointer<StructUdevMonitor> {
      * @return 0 on success, otherwise a negative error value.
      */
     public int filterUpdate() {
-        return UdevLibrary.INSTANCE.udev_monitor_filter_update(getPointer());
+        return UdevLibrary.INSTANCE().udev_monitor_filter_update(getPointer());
     }
 
     /**
@@ -151,7 +151,7 @@ public class Monitor implements HasPointer<StructUdevMonitor> {
      * @return 0 on success, otherwise a negative error value.
      */
     public int filterRemove() {
-        return UdevLibrary.INSTANCE.udev_monitor_filter_remove(getPointer());
+        return UdevLibrary.INSTANCE().udev_monitor_filter_remove(getPointer());
     }
 
     @Override
@@ -165,7 +165,7 @@ public class Monitor implements HasPointer<StructUdevMonitor> {
 
         final Monitor that = (Monitor) o;
 
-        return Pointer.nativeValue(pointer.getPointer()) == Pointer.nativeValue(that.pointer.getPointer());
+        return pointer.equals(that.pointer);
     }
 
     @Override
@@ -175,7 +175,7 @@ public class Monitor implements HasPointer<StructUdevMonitor> {
 
     @Override
     protected void finalize() throws Throwable {
-        UdevLibrary.INSTANCE.udev_monitor_unref(getPointer());
+        UdevLibrary.INSTANCE().udev_monitor_unref(getPointer());
         super.finalize();
     }
 }

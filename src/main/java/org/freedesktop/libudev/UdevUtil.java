@@ -1,5 +1,6 @@
 package org.freedesktop.libudev;
 
+import org.freedesktop.libudev.jna.StringUtil;
 import org.freedesktop.libudev.jna.UdevLibrary;
 
 /**
@@ -19,8 +20,8 @@ public class UdevUtil {
     public static int encodeString(final String str,
                                    final String strEnc,
                                    final int len) {
-        return UdevLibrary.INSTANCE.udev_util_encode_string(str,
-                                                            strEnc,
-                                                            len);
+        return UdevLibrary.INSTANCE().udev_util_encode_string(StringUtil.asPointer(str),
+                                                              StringUtil.asPointer(strEnc),
+                                                              len);
     }
 }

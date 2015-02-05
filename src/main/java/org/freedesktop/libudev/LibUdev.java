@@ -1,7 +1,6 @@
 package org.freedesktop.libudev;
 
 import com.sun.jna.Pointer;
-import org.freedesktop.libudev.jna.StructUdev;
 import org.freedesktop.libudev.jna.UdevLibrary;
 
 /**
@@ -10,7 +9,7 @@ import org.freedesktop.libudev.jna.UdevLibrary;
  * reads the udev config and system environment
  * allows custom logging
  */
-public class LibUdev implements HasPointer<StructUdev> {
+public class LibUdev implements HasPointer {
 
     /**
      * Create udev library context. This reads the udev configuration file, and fills in the default values.
@@ -18,17 +17,17 @@ public class LibUdev implements HasPointer<StructUdev> {
      * @return a new udev library context
      */
     public static LibUdev create() {
-        return new LibUdev(UdevLibrary.INSTANCE.udev_new());
+        return new LibUdev(UdevLibrary.INSTANCE().udev_new());
     }
 
-    private final StructUdev pointer;
+    private final Pointer pointer;
 
-    public LibUdev(final StructUdev pointer) {
+    public LibUdev(final Pointer pointer) {
         this.pointer = pointer;
     }
 
     @Override
-    public StructUdev getPointer() {
+    public Pointer getPointer() {
         return this.pointer;
     }
 
@@ -39,7 +38,7 @@ public class LibUdev implements HasPointer<StructUdev> {
      * @param logger function to be called for logging messages
      */
     public void setLogger(final Logger logger) {
-        UdevLibrary.INSTANCE.udev_set_log_fn(getPointer(),
+        UdevLibrary.INSTANCE().udev_set_log_fn(getPointer(),
                                              logger);
     }
 
@@ -49,7 +48,7 @@ public class LibUdev implements HasPointer<StructUdev> {
      * @return the current logging priority
      */
     public int getLogPriority() {
-        return UdevLibrary.INSTANCE.udev_get_log_priority(getPointer());
+        return UdevLibrary.INSTANCE().udev_get_log_priority(getPointer());
     }
 
 
@@ -59,7 +58,7 @@ public class LibUdev implements HasPointer<StructUdev> {
      * @param priority the new logging priority
      */
     public void setLogPriority(final int priority) {
-        UdevLibrary.INSTANCE.udev_set_log_priority(getPointer(),
+        UdevLibrary.INSTANCE().udev_set_log_priority(getPointer(),
                                                    priority);
     }
 
@@ -69,7 +68,7 @@ public class LibUdev implements HasPointer<StructUdev> {
      * @return stored userdata
      */
     public Object getUserdata() {
-        return UdevLibrary.INSTANCE.udev_get_userdata(getPointer());
+        return UdevLibrary.INSTANCE().udev_get_userdata(getPointer());
     }
 
     @Override
@@ -83,7 +82,7 @@ public class LibUdev implements HasPointer<StructUdev> {
 
         final LibUdev that = (LibUdev) o;
 
-        return Pointer.nativeValue(pointer.getPointer()) == Pointer.nativeValue(that.pointer.getPointer());
+        return pointer.equals(that.pointer);
     }
 
     @Override
@@ -93,7 +92,7 @@ public class LibUdev implements HasPointer<StructUdev> {
 
     @Override
     protected void finalize() throws Throwable {
-        UdevLibrary.INSTANCE.udev_unref(getPointer());
+        UdevLibrary.INSTANCE().udev_unref(getPointer());
         super.finalize();
     }
 

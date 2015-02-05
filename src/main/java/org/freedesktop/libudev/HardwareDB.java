@@ -1,7 +1,8 @@
 package org.freedesktop.libudev;
 
 import com.sun.jna.Pointer;
-import org.freedesktop.libudev.jna.StructUdevHwdb;
+
+import org.freedesktop.libudev.jna.StringUtil;
 import org.freedesktop.libudev.jna.UdevLibrary;
 
 /**
@@ -9,7 +10,7 @@ import org.freedesktop.libudev.jna.UdevLibrary;
  * <p/>
  * Libudev hardware database interface.
  */
-public class HardwareDB implements HasPointer<StructUdevHwdb> {
+public class HardwareDB implements HasPointer {
 
     /**
      * Create a hardware database context to query properties for devices.
@@ -17,17 +18,17 @@ public class HardwareDB implements HasPointer<StructUdevHwdb> {
      * @return a hwdb context.
      */
     public static HardwareDB create(LibUdev libUdev) {
-        return new HardwareDB(UdevLibrary.INSTANCE.udev_hwdb_new(libUdev.getPointer()));
+        return new HardwareDB(UdevLibrary.INSTANCE().udev_hwdb_new(libUdev.getPointer()));
     }
 
-    private final StructUdevHwdb pointer;
+    private final Pointer pointer;
 
-    public HardwareDB(final StructUdevHwdb pointer) {
+    public HardwareDB(final Pointer pointer) {
         this.pointer = pointer;
     }
 
     @Override
-    public StructUdevHwdb getPointer() {
+    public Pointer getPointer() {
         return pointer;
     }
 
@@ -43,9 +44,9 @@ public class HardwareDB implements HasPointer<StructUdevHwdb> {
      */
     public ListEntry getProperties(final String modalias,
                                    final int flags) {
-        return new ListEntry(UdevLibrary.INSTANCE.udev_hwdb_get_properties_list_entry(getPointer(),
-                                                                                      modalias,
-                                                                                      flags));
+        return new ListEntry(UdevLibrary.INSTANCE().udev_hwdb_get_properties_list_entry(getPointer(),
+                                                                                        StringUtil.asPointer(modalias),
+                                                                                        flags));
     }
 
     @Override
@@ -59,7 +60,7 @@ public class HardwareDB implements HasPointer<StructUdevHwdb> {
 
         final HardwareDB that = (HardwareDB) o;
 
-        return Pointer.nativeValue(pointer.getPointer()) == Pointer.nativeValue(that.pointer.getPointer());
+        return pointer.equals(that.pointer);
 
     }
 
@@ -70,7 +71,7 @@ public class HardwareDB implements HasPointer<StructUdevHwdb> {
 
     @Override
     protected void finalize() throws Throwable {
-        UdevLibrary.INSTANCE.udev_hwdb_unref(getPointer());
+        UdevLibrary.INSTANCE().udev_hwdb_unref(getPointer());
         super.finalize();
     }
 }

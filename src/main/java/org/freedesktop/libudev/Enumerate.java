@@ -1,7 +1,8 @@
 package org.freedesktop.libudev;
 
 import com.sun.jna.Pointer;
-import org.freedesktop.libudev.jna.StructUdevEnumerate;
+
+import org.freedesktop.libudev.jna.StringUtil;
 import org.freedesktop.libudev.jna.UdevLibrary;
 
 /**
@@ -9,7 +10,7 @@ import org.freedesktop.libudev.jna.UdevLibrary;
  * <p/>
  * Lookup devices in the sys filesystem, filter devices by properties, and return a sorted list of devices.
  */
-public class Enumerate implements HasPointer<StructUdevEnumerate> {
+public class Enumerate implements HasPointer {
 
     /**
      * Create an enumeration context to scan /sys.
@@ -17,17 +18,17 @@ public class Enumerate implements HasPointer<StructUdevEnumerate> {
      * @return an enumeration context.
      */
     public static Enumerate create(LibUdev libUdev) {
-        return new Enumerate(UdevLibrary.INSTANCE.udev_enumerate_new(libUdev.getPointer()));
+        return new Enumerate(UdevLibrary.INSTANCE().udev_enumerate_new(libUdev.getPointer()));
     }
 
-    private final StructUdevEnumerate pointer;
+    private final Pointer pointer;
 
-    public Enumerate(final StructUdevEnumerate pointer) {
+    public Enumerate(final Pointer pointer) {
         this.pointer = pointer;
     }
 
     @Override
-    public StructUdevEnumerate getPointer() {
+    public Pointer getPointer() {
         return this.pointer;
     }
 
@@ -37,7 +38,7 @@ public class Enumerate implements HasPointer<StructUdevEnumerate> {
      * @return the context.
      */
     public LibUdev getUdev() {
-        return new LibUdev(UdevLibrary.INSTANCE.udev_ref(UdevLibrary.INSTANCE.udev_enumerate_get_udev(getPointer())));
+        return new LibUdev(UdevLibrary.INSTANCE().udev_ref(UdevLibrary.INSTANCE().udev_enumerate_get_udev(getPointer())));
     }
 
     /**
@@ -47,8 +48,8 @@ public class Enumerate implements HasPointer<StructUdevEnumerate> {
      * @return 0 on success, otherwise a negative error value.
      */
     public int addMatchSubsystem(final String subsystem) {
-        return UdevLibrary.INSTANCE.udev_enumerate_add_match_subsystem(getPointer(),
-                                                                       subsystem);
+        return UdevLibrary.INSTANCE().udev_enumerate_add_match_subsystem(getPointer(),
+                                                                         StringUtil.asPointer(subsystem));
     }
 
     /**
@@ -58,8 +59,8 @@ public class Enumerate implements HasPointer<StructUdevEnumerate> {
      * @return 0 on success, otherwise a negative error value.
      */
     public int addNomatchSubsystem(final String subsystem) {
-        return UdevLibrary.INSTANCE.udev_enumerate_add_nomatch_subsystem(getPointer(),
-                                                                         subsystem);
+        return UdevLibrary.INSTANCE().udev_enumerate_add_nomatch_subsystem(getPointer(),
+                                                                           StringUtil.asPointer(subsystem));
     }
 
     /**
@@ -71,9 +72,9 @@ public class Enumerate implements HasPointer<StructUdevEnumerate> {
      */
     public int addMatchSysattr(final String sysattr,
                                final String value) {
-        return UdevLibrary.INSTANCE.udev_enumerate_add_match_sysattr(getPointer(),
-                                                                     sysattr,
-                                                                     value);
+        return UdevLibrary.INSTANCE().udev_enumerate_add_match_sysattr(getPointer(),
+                                                                       StringUtil.asPointer(sysattr),
+                                                                       StringUtil.asPointer(value));
     }
 
     /**
@@ -85,9 +86,9 @@ public class Enumerate implements HasPointer<StructUdevEnumerate> {
      */
     public int addNomatchSysattr(final String sysattr,
                                  final String value) {
-        return UdevLibrary.INSTANCE.udev_enumerate_add_nomatch_sysattr(getPointer(),
-                                                                       sysattr,
-                                                                       value);
+        return UdevLibrary.INSTANCE().udev_enumerate_add_nomatch_sysattr(getPointer(),
+                                                                         StringUtil.asPointer(sysattr),
+                                                                         StringUtil.asPointer(value));
     }
 
     /**
@@ -99,9 +100,9 @@ public class Enumerate implements HasPointer<StructUdevEnumerate> {
      */
     public int addMatchProperty(final String property,
                                 final String value) {
-        return UdevLibrary.INSTANCE.udev_enumerate_add_match_property(getPointer(),
-                                                                      property,
-                                                                      value);
+        return UdevLibrary.INSTANCE().udev_enumerate_add_match_property(getPointer(),
+                                                                        StringUtil.asPointer(property),
+                                                                        StringUtil.asPointer(value));
     }
 
     /**
@@ -111,8 +112,8 @@ public class Enumerate implements HasPointer<StructUdevEnumerate> {
      * @return 0 on success, otherwise a negative error value.
      */
     public int addMatchSysname(final String sysname) {
-        return UdevLibrary.INSTANCE.udev_enumerate_add_match_sysname(getPointer(),
-                                                                     sysname);
+        return UdevLibrary.INSTANCE().udev_enumerate_add_match_sysname(getPointer(),
+                                                                       StringUtil.asPointer(sysname));
     }
 
     /**
@@ -122,8 +123,8 @@ public class Enumerate implements HasPointer<StructUdevEnumerate> {
      * @return 0 on success, otherwise a negative error value.
      */
     public int addMatchTag(final String tag) {
-        return UdevLibrary.INSTANCE.udev_enumerate_add_match_tag(getPointer(),
-                                                                 tag);
+        return UdevLibrary.INSTANCE().udev_enumerate_add_match_tag(getPointer(),
+                                                                   StringUtil.asPointer(tag));
     }
 
     /**
@@ -133,8 +134,8 @@ public class Enumerate implements HasPointer<StructUdevEnumerate> {
      * @return 0 on success, otherwise a negative error value.
      */
     public int addMatchParent(final Device parent) {
-        return UdevLibrary.INSTANCE.udev_enumerate_add_match_parent(getPointer(),
-                                                                    parent.getPointer());
+        return UdevLibrary.INSTANCE().udev_enumerate_add_match_parent(getPointer(),
+                                                                      parent.getPointer());
     }
 
     /**
@@ -150,7 +151,7 @@ public class Enumerate implements HasPointer<StructUdevEnumerate> {
      * @return 0 on success, otherwise a negative error value.
      */
     public int addMatchIsInitialized() {
-        return UdevLibrary.INSTANCE.udev_enumerate_add_match_is_initialized(getPointer());
+        return UdevLibrary.INSTANCE().udev_enumerate_add_match_is_initialized(getPointer());
     }
 
     /**
@@ -160,8 +161,8 @@ public class Enumerate implements HasPointer<StructUdevEnumerate> {
      * @return 0 on success, otherwise a negative error value.
      */
     public int addSyspath(final String syspath) {
-        return UdevLibrary.INSTANCE.udev_enumerate_add_syspath(getPointer(),
-                                                               syspath);
+        return UdevLibrary.INSTANCE().udev_enumerate_add_syspath(getPointer(),
+                                                                 StringUtil.asPointer(syspath));
     }
 
     /**
@@ -170,7 +171,7 @@ public class Enumerate implements HasPointer<StructUdevEnumerate> {
      * @return 0 on success, otherwise a negative error value.
      */
     public int scanDevices() {
-        return UdevLibrary.INSTANCE.udev_enumerate_scan_devices(getPointer());
+        return UdevLibrary.INSTANCE().udev_enumerate_scan_devices(getPointer());
     }
 
     /**
@@ -179,7 +180,7 @@ public class Enumerate implements HasPointer<StructUdevEnumerate> {
      * @return 0 on success, otherwise a negative error value.
      */
     public int scanSubsystems() {
-        return UdevLibrary.INSTANCE.udev_enumerate_scan_subsystems(getPointer());
+        return UdevLibrary.INSTANCE().udev_enumerate_scan_subsystems(getPointer());
     }
 
     /**
@@ -188,7 +189,7 @@ public class Enumerate implements HasPointer<StructUdevEnumerate> {
      * @return a list entry.
      */
     public ListEntry getListEntry() {
-        return new ListEntry(UdevLibrary.INSTANCE.udev_enumerate_get_list_entry(getPointer()));
+        return new ListEntry(UdevLibrary.INSTANCE().udev_enumerate_get_list_entry(getPointer()));
     }
 
     @Override
@@ -202,7 +203,7 @@ public class Enumerate implements HasPointer<StructUdevEnumerate> {
 
         final Enumerate that = (Enumerate) o;
 
-        return Pointer.nativeValue(pointer.getPointer()) == Pointer.nativeValue(that.pointer.getPointer());
+        return pointer.equals(that.pointer);
 
     }
 
@@ -213,7 +214,7 @@ public class Enumerate implements HasPointer<StructUdevEnumerate> {
 
     @Override
     protected void finalize() throws Throwable {
-        UdevLibrary.INSTANCE.udev_enumerate_unref(getPointer());
+        UdevLibrary.INSTANCE().udev_enumerate_unref(getPointer());
         super.finalize();
     }
 }
