@@ -17,7 +17,7 @@ public class HardwareDB implements HasPointer {
      *
      * @return a hwdb context.
      */
-    public static HardwareDB create(LibUdev libUdev) {
+    public static HardwareDB create(final LibUdev libUdev) {
         return new HardwareDB(UdevLibrary.INSTANCE().udev_hwdb_new(libUdev.getPointer()));
     }
 
@@ -44,9 +44,10 @@ public class HardwareDB implements HasPointer {
      */
     public ListEntry getProperties(final String modalias,
                                    final int flags) {
-        return new ListEntry(UdevLibrary.INSTANCE().udev_hwdb_get_properties_list_entry(getPointer(),
-                                                                                        StringUtil.asPointer(modalias),
-                                                                                        flags));
+        final Pointer listPointer = getPointer();
+        return listPointer == null ? null : new ListEntry(UdevLibrary.INSTANCE().udev_hwdb_get_properties_list_entry(listPointer,
+                                                                                                                     StringUtil.asPointer(modalias),
+                                                                                                                     flags));
     }
 
     @Override
