@@ -189,8 +189,7 @@ public class Enumerate implements HasPointer {
      * @return a list entry.
      */
     public ListEntry getListEntry() {
-        final Pointer listPointer = getPointer();
-        return listPointer == null ? null : new ListEntry(UdevLibrary.INSTANCE().udev_enumerate_get_list_entry(listPointer));
+        return ListEntry.create(UdevLibrary.INSTANCE().udev_enumerate_get_list_entry(getPointer()));
     }
 
     @Override

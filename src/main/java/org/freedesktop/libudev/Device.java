@@ -273,8 +273,7 @@ public class Device implements HasPointer {
      * @return the first entry of the device node link list
      */
     public ListEntry getDevlinks() {
-        final Pointer listPointer = getPointer();
-        return listPointer == null ? null : new ListEntry(UdevLibrary.INSTANCE().udev_device_get_devlinks_list_entry(listPointer));
+        return ListEntry.create(UdevLibrary.INSTANCE().udev_device_get_devlinks_list_entry(getPointer()));
     }
 
     /**
@@ -287,8 +286,7 @@ public class Device implements HasPointer {
      * @return the first entry of the property list
      */
     public ListEntry getProperties() {
-        final Pointer listPointer = getPointer();
-        return listPointer == null ? null : new ListEntry(UdevLibrary.INSTANCE().udev_device_get_properties_list_entry(listPointer));
+        return ListEntry.create(UdevLibrary.INSTANCE().udev_device_get_properties_list_entry(getPointer()));
     }
 
     /**
@@ -299,8 +297,7 @@ public class Device implements HasPointer {
      * @return the first entry of the tag list
      */
     public ListEntry getTags() {
-        final Pointer listPointer = getPointer();
-        return listPointer == null ? null : new ListEntry(UdevLibrary.INSTANCE().udev_device_get_tags_list_entry(listPointer));
+        return ListEntry.create(UdevLibrary.INSTANCE().udev_device_get_tags_list_entry(getPointer()));
     }
 
     /**
@@ -310,8 +307,7 @@ public class Device implements HasPointer {
      * @return the first entry of the property list
      */
     public ListEntry getSysattr() {
-        final Pointer listPointer = getPointer();
-        return listPointer == null ? null :  new ListEntry(UdevLibrary.INSTANCE().udev_device_get_sysattr_list_entry(listPointer));
+        return ListEntry.create(UdevLibrary.INSTANCE().udev_device_get_sysattr_list_entry(getPointer()));
     }
 
     /**

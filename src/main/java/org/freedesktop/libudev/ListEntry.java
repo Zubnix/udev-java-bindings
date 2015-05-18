@@ -15,8 +15,17 @@ import org.freedesktop.libudev.jna.UdevLibrary;
  */
 public class ListEntry implements HasPointer {
 
+    public static ListEntry create(final Pointer pointer) {
+        return pointer == null ? null : new ListEntry(pointer);
+    }
+
     private final Pointer pointer;
 
+    /**
+     * Use static {@link #create(Pointer)} factory method.
+     *
+     * @param pointer
+     */
     public ListEntry(final Pointer pointer) {
         this.pointer = pointer;
     }
@@ -30,13 +39,7 @@ public class ListEntry implements HasPointer {
      * @return the next entry from the list, NULL is no more entries are found.
      */
     public ListEntry getNext() {
-        final Pointer listEntryPointer = UdevLibrary.INSTANCE().udev_list_entry_get_next(getPointer());
-        if (listEntryPointer == null) {
-            return null;
-        }
-        else {
-            return new ListEntry(listEntryPointer);
-        }
+        return ListEntry.create(UdevLibrary.INSTANCE().udev_list_entry_get_next(getPointer()));
     }
 
     /**
@@ -44,14 +47,8 @@ public class ListEntry implements HasPointer {
      * @return the entry where name matched, NULL if no matching entry is found.
      */
     public ListEntry getByName(String name) {
-        final Pointer listEntryPointer = UdevLibrary.INSTANCE().udev_list_entry_get_by_name(getPointer(),
-                                                                                            StringUtil.asPointer(name));
-        if (listEntryPointer == null) {
-            return null;
-        }
-        else {
-            return new ListEntry(listEntryPointer);
-        }
+        return ListEntry.create(UdevLibrary.INSTANCE().udev_list_entry_get_by_name(getPointer(),
+                                                                                   StringUtil.asPointer(name)));
     }
 
     /**
