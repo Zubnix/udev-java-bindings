@@ -23,10 +23,9 @@ public class ListEntry implements HasPointer {
 
     /**
      * Use static {@link #create(Pointer)} factory method.
-     *
-     * @param pointer
      */
     public ListEntry(final Pointer pointer) {
+        assert pointer != null;
         this.pointer = pointer;
     }
 

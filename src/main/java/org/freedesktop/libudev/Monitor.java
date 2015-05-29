@@ -19,6 +19,7 @@ public class Monitor implements HasPointer {
     private final Pointer pointer;
 
     public Monitor(final Pointer pointer) {
+        assert pointer != null;
         this.pointer = pointer;
     }
 

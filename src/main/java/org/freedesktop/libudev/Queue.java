@@ -22,6 +22,7 @@ public class Queue implements HasPointer {
     private final Pointer pointer;
 
     public Queue(final Pointer pointer) {
+        assert pointer != null;
         this.pointer = pointer;
     }
 
