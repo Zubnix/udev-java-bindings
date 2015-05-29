@@ -24,6 +24,7 @@ public class Enumerate implements HasPointer {
     private final Pointer pointer;
 
     public Enumerate(final Pointer pointer) {
+        assert pointer != null;
         this.pointer = pointer;
     }
 

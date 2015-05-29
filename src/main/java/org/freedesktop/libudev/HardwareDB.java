@@ -24,6 +24,7 @@ public class HardwareDB implements HasPointer {
     private final Pointer pointer;
 
     public HardwareDB(final Pointer pointer) {
+        assert pointer != null;
         this.pointer = pointer;
     }
 

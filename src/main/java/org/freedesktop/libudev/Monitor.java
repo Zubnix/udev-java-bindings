@@ -12,9 +12,14 @@ import org.freedesktop.libudev.jna.UdevLibrary;
  */
 public class Monitor implements HasPointer {
 
+    public static Monitor create(final Pointer pointer) {
+        return pointer == null ? null : new Monitor(pointer);
+    }
+
     private final Pointer pointer;
 
     public Monitor(final Pointer pointer) {
+        assert pointer != null;
         this.pointer = pointer;
     }
 
@@ -38,14 +43,8 @@ public class Monitor implements HasPointer {
      */
     public static Monitor newFromNetlink(final LibUdev udev,
                                          final String name) {
-        final Pointer monitorPointer = UdevLibrary.INSTANCE().udev_monitor_new_from_netlink(udev.getPointer(),
-                                                                                            StringUtil.asPointer(name));
-        if (monitorPointer == null) {
-            return null;
-        }
-        else {
-            return new Monitor(monitorPointer);
-        }
+        return create(UdevLibrary.INSTANCE().udev_monitor_new_from_netlink(udev.getPointer(),
+                                                                           StringUtil.asPointer(name)));
     }
 
     /**
@@ -98,13 +97,7 @@ public class Monitor implements HasPointer {
      * @return a new udev device, or NULL, in case of an error
      */
     public Device receiveDevice() {
-        final Pointer devicePointer = UdevLibrary.INSTANCE().udev_monitor_receive_device(getPointer());
-        if (devicePointer == null) {
-            return null;
-        }
-        else {
-            return new Device(devicePointer);
-        }
+        return Device.create(UdevLibrary.INSTANCE().udev_monitor_receive_device(getPointer()));
     }
 
     /**

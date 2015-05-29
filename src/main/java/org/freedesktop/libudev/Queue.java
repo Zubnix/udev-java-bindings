@@ -16,17 +16,13 @@ public class Queue implements HasPointer {
      */
     public static Queue create(final LibUdev udev) {
         final Pointer queuePointer = UdevLibrary.INSTANCE().udev_queue_new(udev.getPointer());
-        if (queuePointer == null) {
-            return null;
-        }
-        else {
-            return new Queue(queuePointer);
-        }
+        return queuePointer == null ? null : new Queue(queuePointer);
     }
 
     private final Pointer pointer;
 
     public Queue(final Pointer pointer) {
+        assert pointer != null;
         this.pointer = pointer;
     }
 

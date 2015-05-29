@@ -16,6 +16,11 @@ import org.freedesktop.libudev.jna.UdevLibrary;
  */
 public class Device implements HasPointer {
 
+    protected static Device create(final Pointer devicePointer) {
+        //FIXME should probably be stored in a field to match the native lib's memory management.
+        return devicePointer == null ? null : new Device(devicePointer);
+    }
+
     /**
      * Create new udev device, and fill in information from the sys device and the udev database entry.
      * The syspath is the absolute path to the device, including the sys mount point.
@@ -26,15 +31,8 @@ public class Device implements HasPointer {
      */
     public static Device newFromSyspath(final LibUdev udev,
                                         final String syspath) {
-
-        final Pointer devicePointer = UdevLibrary.INSTANCE().udev_device_new_from_syspath(udev.getPointer(),
-                                                                                          StringUtil.asPointer(syspath));
-        if (devicePointer == null) {
-            return null;
-        }
-        else {
-            return new Device(devicePointer);
-        }
+        return create(UdevLibrary.INSTANCE().udev_device_new_from_syspath(udev.getPointer(),
+                                                                          StringUtil.asPointer(syspath)));
     }
 
     /**
@@ -50,15 +48,9 @@ public class Device implements HasPointer {
     public static Device newFromDevnum(final LibUdev udev,
                                        final byte type,
                                        final int devnum) {
-        final Pointer devicePointer = UdevLibrary.INSTANCE().udev_device_new_from_devnum(udev.getPointer(),
-                                                                                                type,
-                                                                                                devnum);
-        if (devicePointer == null) {
-            return null;
-        }
-        else {
-            return new Device(devicePointer);
-        }
+        return create(UdevLibrary.INSTANCE().udev_device_new_from_devnum(udev.getPointer(),
+                                                                         type,
+                                                                         devnum));
     }
 
     /**
@@ -74,15 +66,9 @@ public class Device implements HasPointer {
     public static Device newFromSubsystemSysname(final LibUdev udev,
                                                  final String subsystem,
                                                  final String sysname) {
-        final Pointer devicePointer = UdevLibrary.INSTANCE().udev_device_new_from_subsystem_sysname(udev.getPointer(),
-                                                                                                    StringUtil.asPointer(subsystem),
-                                                                                                    StringUtil.asPointer(sysname));
-        if (devicePointer == null) {
-            return null;
-        }
-        else {
-            return new Device(devicePointer);
-        }
+        return create(UdevLibrary.INSTANCE().udev_device_new_from_subsystem_sysname(udev.getPointer(),
+                                                                                    StringUtil.asPointer(subsystem),
+                                                                                    StringUtil.asPointer(sysname)));
     }
 
     /**
@@ -96,14 +82,8 @@ public class Device implements HasPointer {
      */
     public static Device newFromDeviceId(final LibUdev udev,
                                          final String id) {
-        final Pointer devicePointer = UdevLibrary.INSTANCE().udev_device_new_from_device_id(udev.getPointer(),
-                                                                                            StringUtil.asPointer(id));
-        if (devicePointer == null) {
-            return null;
-        }
-        else {
-            return new Device(devicePointer);
-        }
+        return create(UdevLibrary.INSTANCE().udev_device_new_from_device_id(udev.getPointer(),
+                                                                            StringUtil.asPointer(id)));
     }
 
     /**
@@ -115,18 +95,13 @@ public class Device implements HasPointer {
      * @return a new udev device, or NULL, if it does not exist
      */
     public static Device newFromEnvironment(final LibUdev udev) {
-        final Pointer devicePointer = UdevLibrary.INSTANCE().udev_device_new_from_environment(udev.getPointer());
-        if (devicePointer == null) {
-            return null;
-        }
-        else {
-            return new Device(devicePointer);
-        }
+        return create(UdevLibrary.INSTANCE().udev_device_new_from_environment(udev.getPointer()));
     }
 
     private final Pointer pointer;
 
     public Device(final Pointer pointer) {
+        assert pointer != null;
         this.pointer = pointer;
     }
 
@@ -152,14 +127,7 @@ public class Device implements HasPointer {
      * @return a new udev device, or NULL, if it no parent exist.
      */
     public Device getParent() {
-        final Pointer devicePointer = UdevLibrary.INSTANCE().udev_device_get_parent(getPointer());
-        if (devicePointer == null) {
-            return null;
-        }
-        else {
-            //FIXME should probably be stored in a field to match the native lib's memory management.
-            return new Device(devicePointer);
-        }
+        return create(UdevLibrary.INSTANCE().udev_device_get_parent(getPointer()));
     }
 
     /**
@@ -173,16 +141,9 @@ public class Device implements HasPointer {
      */
     public Device getParentWithSubsystemDevtype(final String subsystem,
                                                 final String devtype) {
-        final Pointer devicePointer = UdevLibrary.INSTANCE().udev_device_get_parent_with_subsystem_devtype(getPointer(),
-                                                                                                           StringUtil.asPointer(subsystem),
-                                                                                                           StringUtil.asPointer(devtype));
-        if (devicePointer == null) {
-            return null;
-        }
-        else {
-            //FIXME should probably be stored in a field to match the native lib's memory management.
-            return new Device(devicePointer);
-        }
+        return create(UdevLibrary.INSTANCE().udev_device_get_parent_with_subsystem_devtype(getPointer(),
+                                                                                           StringUtil.asPointer(subsystem),
+                                                                                           StringUtil.asPointer(devtype)));
     }
 
     /**
@@ -373,8 +334,7 @@ public class Device implements HasPointer {
      */
     public String getSysattrValue(final String sysattr) {
         return StringUtil.fromPointer(UdevLibrary.INSTANCE().udev_device_get_sysattr_value(getPointer(),
-                                                                                           StringUtil
-                                                                                                   .asPointer(sysattr)));
+                                                                                           StringUtil.asPointer(sysattr)));
     }
 
     /**

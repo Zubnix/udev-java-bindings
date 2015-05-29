@@ -23,6 +23,7 @@ public class LibUdev implements HasPointer {
     private final Pointer pointer;
 
     public LibUdev(final Pointer pointer) {
+        assert pointer != null;
         this.pointer = pointer;
     }
 
