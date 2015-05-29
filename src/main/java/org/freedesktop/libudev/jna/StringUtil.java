@@ -18,10 +18,10 @@ public class StringUtil {
         return pointer;
     }
 
-    public static String fromPointer(Pointer charP){
-        if(charP !=null){
+    public static String fromPointer(Pointer charP) {
+        if (charP != null) {
             return charP.getString(0);
-        }else{
+        } else {
             return null;
         }
     }
